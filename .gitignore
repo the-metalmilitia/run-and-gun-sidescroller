@@ -73,3 +73,42 @@ Plugins/**/Intermediate/*
 
 # Cache files for the editor to use
 DerivedDataCache/*
+
+# === UNREAL ENGINE ===
+# (GitHub's template handles most)
+
+# Additional ignore patterns
+Intermediate/
+DerivedDataCache/
+Saved/
+Build/
+Binaries/
+.vs/
+.vscode/
+*.sln
+*.suo
+*.opensdf
+*.sdf
+
+# === CUSTOM ADDITIONS ===
+
+# Builds (too large for GitHub)
+Builds/
+Packaged/
+
+# Raw assets before import (optional, might want to keep these)
+# Assets/Raw/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temp files
+*.tmp
+*.log
+*.bak
+
+# Large binary assets (if they get too big)
+*.uasset
+*.umap
+# (Comment these out if you want to track them - for small projects it's fine)
