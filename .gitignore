@@ -109,6 +109,6 @@ Thumbs.db
 *.bak
 
 # Large binary assets (if they get too big)
-*.uasset
-*.umap
+#*.uasset
+#*.umap
 # (Comment these out if you want to track them - for small projects it's fine)
