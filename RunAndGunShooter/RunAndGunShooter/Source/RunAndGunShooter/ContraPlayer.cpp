@@ -2,7 +2,8 @@
 
 
 #include "ContraPlayer.h"
-
+#include "EnhancedInput/Public/EnhancedInputSubsystems.h"
+#include "EnhancedInput/Public/EnhancedInputComponent.h"
 // Sets default values
 AContraPlayer::AContraPlayer()
 {
@@ -16,6 +17,14 @@ void AContraPlayer::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	PlayerController = Cast<APlayerController>(Controller);
+	if (PlayerController)
+	{
+		if (UEnhancedInputLocalPlayerSubsystem* SubSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
+		{
+			SubSystem->AddMappingContext(InputMappingContext, 0);
+		}
+	}
 }
 
 // Called every frame
@@ -30,5 +39,45 @@ void AContraPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+	if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent))
+	{
+		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AContraPlayer::MoveEvent);
+		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &AContraPlayer::JumpEvent);
+		EnhancedInputComponent->BindAction(ShootAction, ETriggerEvent::Triggered, this, &AContraPlayer::ShootEvent);
+	}
+}
+
+void AContraPlayer::MoveEvent(const FInputActionValue& Value)
+{
+	FVector2D movement = Value.Get<FVector2D>();
+	if (movement.X == 0)
+	{
+		VerticalSwitch = VerticalSwitchOption::Enum::None;
+	}
+	else
+	{
+		VerticalSwitch = movement.X > 0 ? VerticalSwitchOption::Enum::Up : VerticalSwitchOption::Enum::Down;
+	}
+
+	AddMovementInput(GetActorForwardVector(), movement.Y * Speed * GetWorld()->GetDeltaSeconds());
+
+	if (movement.Y < 0)
+	{
+		AddControllerYawInput(-180.0f * GetWorld()->GetDeltaSeconds());
+	}
+}
+
+void AContraPlayer::JumpEvent(const FInputActionValue& Value)
+{
+	Jump();
+	if (VerticalSwitch == VerticalSwitchOption::Enum::None)
+	{
+		///change floor
+	}
+}
+
+void AContraPlayer::ShootEvent(const FInputActionValue& Value)
+{
+	
 }
 

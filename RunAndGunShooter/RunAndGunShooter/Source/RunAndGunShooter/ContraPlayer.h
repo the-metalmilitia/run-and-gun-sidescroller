@@ -3,9 +3,20 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Camera/CameraComponent.h"
+#include "InputMappingContext.h"
+#include "InputAction.h"
 #include "GameFramework/Character.h"
 #include "ContraPlayer.generated.h"
+
+struct VerticalSwitchOption
+{
+	enum Enum
+	{
+		None,
+		Up,
+		Down
+	};
+};
 
 UCLASS()
 class RUNANDGUNSHOOTER_API AContraPlayer : public ACharacter
@@ -21,7 +32,25 @@ protected:
 	virtual void BeginPlay() override;
 
 	UPROPERTY(EditAnywhere)
-	UCameraComponent* PlayerCamera;
+	UInputMappingContext* InputMappingContext;
+
+	UPROPERTY(EditAnywhere)
+	UInputAction* MoveAction;
+
+	UPROPERTY(EditAnywhere)
+	UInputAction* JumpAction;
+
+	UPROPERTY(EditAnywhere)
+	UInputAction* ShootAction;
+
+	UPROPERTY(EditAnywhere)
+	float Speed = 600.0f;
+
+	UPROPERTY(EditDefaultsOnly)
+	float UpperPlatformSwitchDepth = 0.0f;
+
+	UPROPERTY(EditDefaultsOnly)
+	float LowerPlatformSwitchDepth = 0.0f;
 
 public:	
 	// Called every frame
@@ -30,4 +59,12 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+private:
+	void MoveEvent(const FInputActionValue& Value);
+	void JumpEvent(const FInputActionValue& Value);
+	void ShootEvent(const FInputActionValue& Value);
+
+	VerticalSwitchOption::Enum VerticalSwitch = VerticalSwitchOption::Enum::None;
+
+	APlayerController* PlayerController = nullptr;
 };
