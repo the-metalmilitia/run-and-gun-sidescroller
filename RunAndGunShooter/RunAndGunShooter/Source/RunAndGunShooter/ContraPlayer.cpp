@@ -58,12 +58,18 @@ void AContraPlayer::MoveEvent(const FInputActionValue& Value)
 	{
 		VerticalSwitch = movement.X > 0 ? VerticalSwitchOption::Enum::Up : VerticalSwitchOption::Enum::Down;
 	}
-
-	AddMovementInput(GetActorForwardVector(), movement.Y * Speed * GetWorld()->GetDeltaSeconds());
-
-	if (movement.Y < 0)
+	
+	AddMovementInput(FVector::ForwardVector, movement.Y * Speed * GetWorld()->GetDeltaSeconds());
+	UE_LOG(LogTemp, Warning, TEXT("forawrd: %s"), *GetActorForwardVector().ToString());
+	
+	FRotator currentRotation = GetActorRotation();
+	if (movement.Y < 0 && currentRotation.Yaw != 180.0f)
 	{
-		AddControllerYawInput(-180.0f * GetWorld()->GetDeltaSeconds());
+		SetActorRotation(FRotator(0.0f, 180.0f, 0.0f));
+	}
+	else if (movement.Y > 0 && currentRotation.Yaw != 0.0f)
+	{
+		SetActorRotation(FRotator(0.0f, 0.0f, 0.0f));
 	}
 }
 
