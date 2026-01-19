@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GunBase.h"
 #include "InputMappingContext.h"
 #include "InputAction.h"
 #include "GameFramework/Character.h"
@@ -18,7 +19,7 @@ struct VerticalSwitchOption
 	};
 };
 
-UCLASS()
+UCLASS(Blueprintable)
 class RUNANDGUNSHOOTER_API AContraPlayer : public ACharacter
 {
 	GENERATED_BODY()
@@ -52,10 +53,15 @@ protected:
 	UPROPERTY(EditDefaultsOnly)
 	float LowerPlatformSwitchDepth = 0.0f;
 
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<AGunBase> Rifle;
+
+	
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
+	
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
@@ -67,4 +73,7 @@ private:
 	VerticalSwitchOption::Enum VerticalSwitch = VerticalSwitchOption::Enum::None;
 
 	APlayerController* PlayerController = nullptr;
+
+	UPROPERTY(VisibleAnywhere)
+	AGunBase* CurrentWeapon = nullptr;
 };

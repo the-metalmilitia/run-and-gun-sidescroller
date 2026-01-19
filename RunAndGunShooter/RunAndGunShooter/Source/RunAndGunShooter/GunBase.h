@@ -3,20 +3,19 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "ProjectileBase.h"
 #include "GameFramework/Actor.h"
-#include "Gun.generated.h"
+#include "GunBase.generated.h"
 
 UCLASS()
-class RUNANDGUNSHOOTER_API AGun : public AActor
+class RUNANDGUNSHOOTER_API AGunBase : public AActor
 {
 	GENERATED_BODY()
 	
 public:	
 	// Sets default values for this actor's properties
-	AGun();
+	AGunBase();
 
-	UPROPERTY(EditAnywhere)
-	UStaticMeshComponent* GunMesh;
 
 protected:
 	// Called when the game starts or when spawned
@@ -26,4 +25,13 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+protected:
+	UPROPERTY(VisibleAnywhere)
+	USceneComponent* Root;
+	
+	UPROPERTY(VisibleAnywhere)
+	USkeletalMeshComponent* GunMesh;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AProjectileBase> Projectile;
 };

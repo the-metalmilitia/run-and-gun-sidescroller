@@ -25,6 +25,24 @@ void AContraPlayer::BeginPlay()
 			SubSystem->AddMappingContext(InputMappingContext, 0);
 		}
 	}
+
+	GetMesh()->HideBoneByName("weapon_r", EPhysBodyOp::PBO_None);
+
+	if(Rifle != nullptr)
+	{
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.Owner = this;
+		SpawnParams.Instigator = GetInstigator();
+		AGunBase* newGun = GetWorld()->SpawnActor<AGunBase>(Rifle, SpawnParams);
+
+		if(newGun)
+		{
+			FAttachmentTransformRules AttachmentRule(EAttachmentRule::SnapToTarget, true);
+			newGun->AttachToComponent(GetMesh(), AttachmentRule, TEXT("WeaponSocket"));
+
+			CurrentWeapon = newGun;
+		}
+	}
 }
 
 // Called every frame
