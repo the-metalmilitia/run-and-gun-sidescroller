@@ -63,7 +63,6 @@ void AContraPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &AContraPlayer::JumpEvent);
 		EnhancedInputComponent->BindAction(ShootAction, ETriggerEvent::Triggered, this, &AContraPlayer::ShootEvent);
 		EnhancedInputComponent->BindAction(VerticalMoveAction, ETriggerEvent::Triggered, this, &AContraPlayer::VerticalMoveEvent);
-		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AContraPlayer::LookEvent);
 	}
 }
 
@@ -121,11 +120,5 @@ void AContraPlayer::JumpEvent(const FInputActionValue& Value)
 void AContraPlayer::ShootEvent(const FInputActionValue& Value)
 {
 	
-}
-
-void AContraPlayer::LookEvent(const FInputActionValue& value)
-{
-	float lookAxis = value.Get<float>() * LookSpeed * GetWorld()->GetDeltaSeconds();
-	AddControllerPitchInput(-lookAxis);
 }
 

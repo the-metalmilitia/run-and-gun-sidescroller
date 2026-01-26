@@ -48,13 +48,7 @@ protected:
 	UInputAction* ShootAction;
 
 	UPROPERTY(EditAnywhere)
-	UInputAction* LookAction;
-
-	UPROPERTY(EditAnywhere)
 	float Speed = 600.0f;
-
-	UPROPERTY(EditAnywhere)
-	float LookSpeed = 10.0f;
 
 	UPROPERTY(EditDefaultsOnly)
 	float UpperPlatformSwitchDepth = 0.0f;
@@ -79,7 +73,6 @@ private:
 	void VerticalMoveEvent(const FInputActionValue& Value);
 	void JumpEvent(const FInputActionValue& Value);
 	void ShootEvent(const FInputActionValue& Value);
-	void LookEvent(const FInputActionValue& value);
 
 	VerticalSwitchOption::Enum VerticalSwitch = VerticalSwitchOption::Enum::None;
 
