@@ -57,10 +57,7 @@ protected:
 	float LookSpeed = 10.0f;
 
 	UPROPERTY(EditDefaultsOnly)
-	float UpperPlatformSwitchDepth = 0.0f;
-
-	UPROPERTY(EditDefaultsOnly)
-	float LowerPlatformSwitchDepth = 0.0f;
+	float PlatformSwitchDepth = 0.0f;
 
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<AGunBase> Rifle;

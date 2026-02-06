@@ -112,9 +112,17 @@ void AContraPlayer::VerticalMoveEvent(const FInputActionValue& Value)
 void AContraPlayer::JumpEvent(const FInputActionValue& Value)
 {
 	Jump();
-	if (VerticalSwitch == VerticalSwitchOption::Enum::None)
+
+	FVector CurrentLocation = GetActorLocation();
+	if (VerticalSwitch == VerticalSwitchOption::Enum::Down)
 	{
-		///change floor
+		CurrentLocation.Y += PlatformSwitchDepth;
+		SetActorLocation(CurrentLocation);
+	}
+	else if(VerticalSwitch == VerticalSwitchOption::Enum::Up)
+	{
+		CurrentLocation.Y -= PlatformSwitchDepth;
+		SetActorLocation(CurrentLocation);
 	}
 }
 
