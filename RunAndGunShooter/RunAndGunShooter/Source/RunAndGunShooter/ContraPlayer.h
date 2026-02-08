@@ -3,20 +3,20 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "ContraPlayerController.h"
 #include "GunBase.h"
 #include "InputMappingContext.h"
 #include "InputAction.h"
 #include "GameFramework/Character.h"
 #include "ContraPlayer.generated.h"
 
-struct VerticalSwitchOption
+UENUM(BlueprintType)
+enum VerticalSwitchOption
 {
-	enum Enum
-	{
-		None,
-		Up,
-		Down
-	};
+	None,
+	Up,
+	Down,
+	Bothways
 };
 
 UCLASS(Blueprintable)
@@ -62,7 +62,14 @@ protected:
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<AGunBase> Rifle;
 
+	UPROPERTY(EditDefaultsOnly)
+	float MidAirTimeBeforePlatformSwitch = 0.5f;
+
+	UPROPERTY(EditAnywhere)
+	float MaxHealth = 100.0f;
 	
+	UPROPERTY(VisibleAnywhere)
+	float CurrentHealth;
 
 public:	
 	// Called every frame
@@ -71,6 +78,19 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	UFUNCTION(BlueprintCallable)
+	void AllowPlatformSwitch(const VerticalSwitchOption allowedSwitch);
+
+	UFUNCTION(BlueprintCallable)
+	void TriggerPlayerDamage(float DamageAmount);
+	
+	UFUNCTION(BlueprintPure)
+	bool IsDead() const { return CurrentHealth <= 0.0f; }
+
+	
+	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
+	
+
 private:
 	void MoveEvent(const FInputActionValue& Value);
 	void VerticalMoveEvent(const FInputActionValue& Value);
@@ -78,10 +98,17 @@ private:
 	void ShootEvent(const FInputActionValue& Value);
 	void LookEvent(const FInputActionValue& value);
 
-	VerticalSwitchOption::Enum VerticalSwitch = VerticalSwitchOption::Enum::None;
+	void SwitchPlatform();
 
-	APlayerController* PlayerController = nullptr;
+	VerticalSwitchOption VerticalSwitch = VerticalSwitchOption::None;
+	VerticalSwitchOption AllowedSwitch = VerticalSwitchOption::Bothways;
+
+	AContraPlayerController* PlayerController = nullptr;
 
 	UPROPERTY(VisibleAnywhere)
 	AGunBase* CurrentWeapon = nullptr;
+
+	bool bIsJumping = false;
+	bool bIsPlatformSwitchAllowed = true;
+	float CurrentJumpTime = 0.0f;
 };

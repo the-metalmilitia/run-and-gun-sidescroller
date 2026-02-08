@@ -2,8 +2,11 @@
 
 
 #include "ContraPlayer.h"
+
+#include "Components/CapsuleComponent.h"
 #include "EnhancedInput/Public/EnhancedInputSubsystems.h"
 #include "EnhancedInput/Public/EnhancedInputComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 // Sets default values
 AContraPlayer::AContraPlayer()
 {
@@ -16,8 +19,10 @@ AContraPlayer::AContraPlayer()
 void AContraPlayer::BeginPlay()
 {
 	Super::BeginPlay();
+
+	CurrentHealth = MaxHealth;
 	
-	PlayerController = Cast<APlayerController>(Controller);
+	PlayerController = Cast<AContraPlayerController>(Controller);
 	if (PlayerController)
 	{
 		if (UEnhancedInputLocalPlayerSubsystem* SubSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
@@ -50,6 +55,15 @@ void AContraPlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (bIsJumping)
+	{
+		if (GetWorld()->GetTimeSeconds() - CurrentJumpTime >= MidAirTimeBeforePlatformSwitch)
+		{
+			SwitchPlatform();
+		}
+	}
+
+	
 }
 
 // Called to bind functionality to input
@@ -65,6 +79,33 @@ void AContraPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 		EnhancedInputComponent->BindAction(VerticalMoveAction, ETriggerEvent::Triggered, this, &AContraPlayer::VerticalMoveEvent);
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AContraPlayer::LookEvent);
 	}
+}
+
+void AContraPlayer::AllowPlatformSwitch(const VerticalSwitchOption allowedSwitch)
+{
+	AllowedSwitch = allowedSwitch;
+}
+
+void AContraPlayer::TriggerPlayerDamage(float DamageAmount)
+{
+	
+}
+
+float AContraPlayer::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent,
+                                class AController* EventInstigator, AActor* DamageCauser)
+{
+	float DamageApplied = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	CurrentHealth -= DamageApplied;
+
+	if (IsDead())
+	{
+		PlayerController->CallPlayerDeath();
+		
+		DetachFromControllerPendingDestroy();
+		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		return 0.0f;
+	}
+	return  DamageApplied;
 }
 
 void AContraPlayer::MoveEvent(const FInputActionValue& Value)
@@ -91,20 +132,24 @@ void AContraPlayer::MoveEvent(const FInputActionValue& Value)
 void AContraPlayer::VerticalMoveEvent(const FInputActionValue& Value)
 {
 	float movement = Value.Get<float>();
-	if (movement > 0)
+	if (movement > 0
+		&& (AllowedSwitch == VerticalSwitchOption::Bothways
+			|| AllowedSwitch == VerticalSwitchOption::Up))
 	{
 		UnCrouch();
-		VerticalSwitch = VerticalSwitchOption::Enum::Up;
+		VerticalSwitch = VerticalSwitchOption::Up;
 	}
-	else if (movement < 0)
+	else if (movement < 0
+		&& (AllowedSwitch == VerticalSwitchOption::Bothways
+			|| AllowedSwitch == VerticalSwitchOption::Down))
 	{
-		VerticalSwitch = VerticalSwitchOption::Enum::Down;
+		VerticalSwitch = VerticalSwitchOption::Down;
 		Crouch();
 	}
 	else
 	{
 		UnCrouch();
-		VerticalSwitch = VerticalSwitchOption::Enum::None;
+		VerticalSwitch = VerticalSwitchOption::None;
 		UE_LOG(LogTemp, Warning, TEXT("%f"),movement);
 	}
 }
@@ -112,17 +157,10 @@ void AContraPlayer::VerticalMoveEvent(const FInputActionValue& Value)
 void AContraPlayer::JumpEvent(const FInputActionValue& Value)
 {
 	Jump();
-
-	FVector CurrentLocation = GetActorLocation();
-	if (VerticalSwitch == VerticalSwitchOption::Enum::Down)
+	if (bIsPlatformSwitchAllowed)
 	{
-		CurrentLocation.Y += PlatformSwitchDepth;
-		SetActorLocation(CurrentLocation);
-	}
-	else if(VerticalSwitch == VerticalSwitchOption::Enum::Up)
-	{
-		CurrentLocation.Y -= PlatformSwitchDepth;
-		SetActorLocation(CurrentLocation);
+		bIsJumping = true;
+		CurrentJumpTime = GetWorld()->GetTimeSeconds();
 	}
 }
 
@@ -135,5 +173,22 @@ void AContraPlayer::LookEvent(const FInputActionValue& value)
 {
 	float lookAxis = value.Get<float>() * LookSpeed * GetWorld()->GetDeltaSeconds();
 	AddControllerPitchInput(-lookAxis);
+}
+
+void AContraPlayer::SwitchPlatform()
+{
+	bIsJumping = false;
+	CurrentJumpTime = 0.0f;
+	FVector CurrentLocation = GetActorLocation();
+	if (VerticalSwitch == VerticalSwitchOption::Down)
+	{
+		CurrentLocation.Y += PlatformSwitchDepth;
+		SetActorLocation(CurrentLocation);
+	}
+	else if(VerticalSwitch == VerticalSwitchOption::Up)
+	{
+		CurrentLocation.Y -= PlatformSwitchDepth;
+		SetActorLocation(CurrentLocation);
+	}
 }
 
