@@ -3,3 +3,9 @@
 
 #include "ContraGameMode.h"
 
+void AContraGameMode::StartPlay()
+{
+	Super::StartPlay();
+
+	CurrentLives = MaxLives;
+}

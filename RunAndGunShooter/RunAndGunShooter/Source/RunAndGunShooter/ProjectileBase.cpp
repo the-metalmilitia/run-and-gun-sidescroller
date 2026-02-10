@@ -3,6 +3,7 @@
 
 #include "ProjectileBase.h"
 
+
 // Sets default values
 AProjectileBase::AProjectileBase()
 {

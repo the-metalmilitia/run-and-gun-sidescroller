@@ -6,12 +6,21 @@
 #include "GameFramework/Actor.h"
 #include "ProjectileBase.generated.h"
 
+
+UENUM(BlueprintType)
+enum ProjectileType
+{
+	Default = 0,
+	Spread = 1,
+	MachineGun = 2,
+	Spinning = 3
+};
 UCLASS()
 class RUNANDGUNSHOOTER_API AProjectileBase : public AActor
 {
 	GENERATED_BODY()
 	
-public:	
+public:
 	// Sets default values for this actor's properties
 	AProjectileBase();
 
@@ -26,6 +35,8 @@ public:
 	float GetProjectileSpeed() const { return ProjectileSpeed; }
 	float GetDamage() const { return Damage; }
 
+	ProjectileType GetProjectileType() const { return Type; }
+
 private:
 	UPROPERTY(VisibleAnywhere)
 	USceneComponent* Root;
@@ -38,4 +49,7 @@ private:
 
 	UPROPERTY(EditDefaultsOnly)
 	float Damage = 10.0f;
+
+protected:
+	ProjectileType Type = ProjectileType::Default;
 };

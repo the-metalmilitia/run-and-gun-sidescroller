@@ -3,11 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "ProjectileBase.h"
 #include "GameFramework/Actor.h"
+#include "ProjectileBase.h"
 #include "GunBase.generated.h"
 
-UCLASS()
+UCLASS(Blueprintable)
 class RUNANDGUNSHOOTER_API AGunBase : public AActor
 {
 	GENERATED_BODY()
@@ -15,16 +15,22 @@ class RUNANDGUNSHOOTER_API AGunBase : public AActor
 public:	
 	// Sets default values for this actor's properties
 	AGunBase();
-
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+public:
+	UFUNCTION(BlueprintCallable)
+	void SetProjectile(ProjectileType type);
 
+	UFUNCTION(BlueprintCallable)
+	ProjectileType GetProjectileType() const { return SpawnedProjectileType; }
+
+	virtual void Shoot();
+	
 protected:
 	UPROPERTY(VisibleAnywhere)
 	USceneComponent* Root;
@@ -33,5 +39,12 @@ protected:
 	USkeletalMeshComponent* GunMesh;
 
 	UPROPERTY(EditAnywhere)
-	TSubclassOf<AProjectileBase> Projectile;
+	TArray<TSubclassOf<AProjectileBase>> TypesOfProjectile;
+
+	UPROPERTY(EditAnywhere)
+	int ProjectilePoolSize = 10;
+
+private:
+	ProjectileType SpawnedProjectileType;
+	TQueue<AProjectileBase*> SpawnedProjectilePool;
 };

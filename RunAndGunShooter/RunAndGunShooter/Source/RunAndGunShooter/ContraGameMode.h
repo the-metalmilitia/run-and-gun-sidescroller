@@ -13,5 +13,13 @@ UCLASS()
 class RUNANDGUNSHOOTER_API AContraGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
-	
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	uint8 MaxLives = 3;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	uint8 CurrentLives = 3;
+
+	virtual void StartPlay() override;
 };

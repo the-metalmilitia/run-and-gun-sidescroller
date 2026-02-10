@@ -19,6 +19,25 @@ AGunBase::AGunBase()
 void AGunBase::BeginPlay()
 {
 	Super::BeginPlay();
+	SetProjectile(ProjectileType::Default);
+}
+
+void AGunBase::SetProjectile(ProjectileType type)
+{
+	SpawnedProjectileType = type;
+	SpawnedProjectilePool.Empty();
+	for(int i = 0; i < ProjectilePoolSize; i++)
+	{
+		SpawnedProjectilePool.Enqueue(GetWorld()->SpawnActor<AProjectileBase>(TypesOfProjectile[type]));
+	}
+}
+
+void AGunBase::Shoot()
+{
+	AProjectileBase* Projectile = nullptr;
+	SpawnedProjectilePool.Dequeue(Projectile);
+
+	
 }
 
 // Called every frame

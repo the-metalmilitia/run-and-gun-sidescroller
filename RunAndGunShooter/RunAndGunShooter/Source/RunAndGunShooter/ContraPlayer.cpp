@@ -4,6 +4,7 @@
 #include "ContraPlayer.h"
 
 #include "Components/CapsuleComponent.h"
+#include "Engine/DamageEvents.h"
 #include "EnhancedInput/Public/EnhancedInputSubsystems.h"
 #include "EnhancedInput/Public/EnhancedInputComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -88,7 +89,10 @@ void AContraPlayer::AllowPlatformSwitch(const VerticalSwitchOption allowedSwitch
 
 void AContraPlayer::TriggerPlayerDamage(float DamageAmount)
 {
-	
+
+	FDamageEvent DamageEvent;
+	DamageEvent.DamageTypeClass = UDamageType::StaticClass();
+	TakeDamage(DamageAmount, DamageEvent, PlayerController, this);
 }
 
 float AContraPlayer::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent,
