@@ -10,6 +10,7 @@
 UENUM(BlueprintType)
 enum ProjectileType
 {
+	Invalid = -1,
 	Default = 0,
 	Spread = 1,
 	MachineGun = 2,
