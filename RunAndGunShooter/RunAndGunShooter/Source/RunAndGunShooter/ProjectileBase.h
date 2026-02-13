@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "GameFramework/ProjectileMovementComponent.h"
 #include "ProjectileBase.generated.h"
 
 
@@ -44,6 +45,9 @@ private:
 
 	UPROPERTY(VisibleAnywhere)
 	UStaticMeshComponent* ProjectileMesh;
+
+	UPROPERTY(VisibleAnywhere)
+	UProjectileMovementComponent* MovementComponent;
 
 	UPROPERTY(EditDefaultsOnly)
 	float ProjectileSpeed = 2000.0f;

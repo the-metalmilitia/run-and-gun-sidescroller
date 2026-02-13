@@ -10,15 +10,18 @@
 /**
  * 
  */
-UCLASS()
+UCLASS(Blueprintable)
 class RUNANDGUNSHOOTER_API UProjectileDataManager : public UDataAsset
 {
 	GENERATED_BODY()
 
 public:
-	void GetProjectileFromPool(TSubclassOf<AProjectileBase> ProjectileClass, TArray<AProjectileBase*> Projectiles, int Amount);
-	void ReturnProjectileToPool(AProjectileBase* Projectile);
 	void CreateProjectilePool(ProjectileType type);
+	void GetProjectileFromPool(ProjectileType Type, TArray<AProjectileBase*> Projectiles, int Amount);
+
+	UFUNCTION(BlueprintCallable)
+	void ReturnProjectileToPool(AProjectileBase* Projectile);
+
 	ProjectileType GetCurrentProjectileType() const;
 	
 private:

@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "ProjectileBase.h"
+#include "ProjectileDataManager.h"
 #include "GunBase.generated.h"
 
 UCLASS(Blueprintable)
@@ -24,7 +25,7 @@ protected:
 
 public:
 	UFUNCTION(BlueprintCallable)
-	void SetProjectile(ProjectileType type);
+	void SetProjectile(ProjectileType type, int AmountPerShot = 1);
 
 	UFUNCTION(BlueprintCallable)
 	ProjectileType GetProjectileType() const { return SpawnedProjectileType; }
@@ -37,14 +38,18 @@ protected:
 	
 	UPROPERTY(VisibleAnywhere)
 	USkeletalMeshComponent* GunMesh;
+	
+	UPROPERTY(VisibleAnywhere)
+	USceneComponent* ProjectileSpawnPoint;
 
-	UPROPERTY(EditAnywhere)
-	TArray<TSubclassOf<AProjectileBase>> TypesOfProjectile;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UProjectileDataManager* ProjectileDataManager;
 
-	UPROPERTY(EditAnywhere)
-	int ProjectilePoolSize = 10;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	uint8 ProjectileAmountPerShot = 1;
 
-private:
+protected:
 	ProjectileType SpawnedProjectileType;
-	TQueue<AProjectileBase*> SpawnedProjectilePool;
+	TArray<AProjectileBase*> ProjectilesPerShot;
+
 };

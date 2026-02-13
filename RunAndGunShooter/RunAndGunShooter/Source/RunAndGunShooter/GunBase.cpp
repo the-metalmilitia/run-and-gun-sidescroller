@@ -13,6 +13,9 @@ AGunBase::AGunBase()
 	SetRootComponent(Root);
 	GunMesh = CreateDefaultSubobject<USkeletalMeshComponent>("GunMesh");
 	GunMesh->SetupAttachment(Root);
+
+	ProjectileSpawnPoint = CreateDefaultSubobject<USceneComponent>("ProjectileLaunchPoint");
+	ProjectileSpawnPoint->SetupAttachment(Root);
 }
 
 // Called when the game starts or when spawned
@@ -22,22 +25,19 @@ void AGunBase::BeginPlay()
 	SetProjectile(ProjectileType::Default);
 }
 
-void AGunBase::SetProjectile(ProjectileType type)
+void AGunBase::SetProjectile(ProjectileType type, int AmountPerShot)
 {
+	ProjectileAmountPerShot = AmountPerShot;
 	SpawnedProjectileType = type;
-	SpawnedProjectilePool.Empty();
-	for(int i = 0; i < ProjectilePoolSize; i++)
+	if(ProjectileDataManager)
 	{
-		SpawnedProjectilePool.Enqueue(GetWorld()->SpawnActor<AProjectileBase>(TypesOfProjectile[type]));
+		ProjectileDataManager->CreateProjectilePool(type);
 	}
 }
 
 void AGunBase::Shoot()
 {
-	AProjectileBase* Projectile = nullptr;
-	SpawnedProjectilePool.Dequeue(Projectile);
-
-	
+	ProjectileDataManager->GetProjectileFromPool(SpawnedProjectileType, ProjectilesPerShot, ProjectileAmountPerShot);
 }
 
 // Called every frame

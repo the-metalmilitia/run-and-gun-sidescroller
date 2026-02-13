@@ -13,7 +13,7 @@ AContraPlayer::AContraPlayer()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
+	
 }
 
 // Called when the game starts or when spawned
@@ -170,7 +170,10 @@ void AContraPlayer::JumpEvent(const FInputActionValue& Value)
 
 void AContraPlayer::ShootEvent(const FInputActionValue& Value)
 {
-	
+	if(CurrentWeapon)
+	{
+		CurrentWeapon->Shoot();
+	}
 }
 
 void AContraPlayer::LookEvent(const FInputActionValue& value)

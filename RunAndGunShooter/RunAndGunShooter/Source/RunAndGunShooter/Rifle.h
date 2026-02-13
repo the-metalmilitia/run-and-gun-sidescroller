@@ -13,5 +13,9 @@ UCLASS()
 class RUNANDGUNSHOOTER_API ARifle : public AGunBase
 {
 	GENERATED_BODY()
+
+public:
+	void Shoot() override;
+
 	
 };
