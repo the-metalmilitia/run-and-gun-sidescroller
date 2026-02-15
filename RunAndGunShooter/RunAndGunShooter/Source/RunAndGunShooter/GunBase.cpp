@@ -22,6 +22,7 @@ AGunBase::AGunBase()
 void AGunBase::BeginPlay()
 {
 	Super::BeginPlay();
+	ProjectileDataManager->Initialize(GetWorld());
 	SetProjectile(ProjectileType::Default);
 }
 
@@ -38,6 +39,20 @@ void AGunBase::SetProjectile(ProjectileType type, int AmountPerShot)
 void AGunBase::Shoot()
 {
 	ProjectileDataManager->GetProjectileFromPool(SpawnedProjectileType, ProjectilesPerShot, ProjectileAmountPerShot);
+	for (AProjectileBase* Projectile : ProjectilesPerShot)
+	{
+		if (Projectile)
+		{
+			Projectile->SetActorLocation(ProjectileSpawnPoint->GetComponentLocation());
+			Projectile->SetActorRotation(ProjectileSpawnPoint->GetComponentRotation());
+			Projectile->SetActorHiddenInGame(false);
+			Projectile->SetActorEnableCollision(true);
+			Projectile->SetActorTickEnabled(true);
+			Projectile->SetVelocity();
+			UE_LOG(LogTemp, Warning, TEXT("Projectile of type %d shot"), SpawnedProjectileType);
+		}
+	}
+	
 }
 
 // Called every frame

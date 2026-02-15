@@ -112,3 +112,7 @@ Thumbs.db
 #*.uasset
 #*.umap
 # (Comment these out if you want to track them - for small projects it's fine)
+RunAndGunShooter/RunAndGunShooter/global.json
+RunAndGunShooter/RunAndGunShooter/RunAndGunShooter.sln.DotSettings.user
+RunAndGunShooter/RunAndGunShooter/global.json
+RunAndGunShooter/RunAndGunShooter/global.json

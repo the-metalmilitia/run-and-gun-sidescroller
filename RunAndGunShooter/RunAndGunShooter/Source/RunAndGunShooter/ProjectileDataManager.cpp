@@ -13,6 +13,8 @@ void UProjectileDataManager::GetProjectileFromPool(ProjectileType Type,
 		|| Amount > QueueSizeCounter
 		|| Amount > MaxProjectilePoolSize)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("Type: %d, Amount: %d, QueueSizeCounter: %d Pool is Empty: %d, CurrentPoolType: %d")
+			, Type, Amount, QueueSizeCounter, ProjectilePool.IsEmpty(), GetCurrentProjectileType());
 		return;
 	}
 
@@ -31,6 +33,7 @@ void UProjectileDataManager::GetProjectileFromPool(ProjectileType Type,
 			Projectiles.Add(Projectile);
 			Amount--;
 			QueueSizeCounter--;
+			UE_LOG(LogTemp, Warning, TEXT("Projectile dequeued of type %d"), Type);
 		}
 	}
 }
@@ -45,21 +48,16 @@ void UProjectileDataManager::ReturnProjectileToPool(AProjectileBase* Projectile)
 	}
 
 	ProjectilePool.Enqueue(Projectile);
+	QueueSizeCounter++;
 }
 
-ProjectileType UProjectileDataManager::GetCurrentProjectileType() const
+void UProjectileDataManager::Initialize(UWorld* WorldContext)
 {
-	if (ProjectilePool.IsEmpty())
-	{
-		return ProjectileType::Invalid;
-	}
-	
-	return ((AProjectileBase*)ProjectilePool.Peek())->GetProjectileType();
+	CurrentWorld = WorldContext;
 }
 
 void UProjectileDataManager::CreateProjectilePool(ProjectileType type)
 {
-
 	if(TypesOfProjectile.Num() == 0
 		|| type == ProjectileType::Invalid
 		|| type >= TypesOfProjectile.Num()
@@ -72,13 +70,17 @@ void UProjectileDataManager::CreateProjectilePool(ProjectileType type)
 	QueueSizeCounter = 0;
 	for (int i = 0; i < MaxProjectilePoolSize; i++)
 	{
-		AProjectileBase* ProjectileToSpawn = GetWorld()->SpawnActor<AProjectileBase>();
+		AProjectileBase* ProjectileToSpawn = GetWorld()->SpawnActor<AProjectileBase>(TypesOfProjectile[static_cast<int>(type)]->GetClass(), FVector::ZeroVector, FRotator::ZeroRotator);;
+		ProjectileToSpawn->SetActorEnableCollision(false);
+		ProjectileToSpawn->SetActorHiddenInGame(true);
+		ProjectileToSpawn->SetActorTickEnabled(false);
 		UE_LOG(LogTemp, Warning, TEXT("ProjectileToSpawn: %s"), *ProjectileToSpawn->GetName());
 
 		if(ProjectileToSpawn)
 		{
 			ProjectilePool.Enqueue(ProjectileToSpawn);
-			// 	QueueSizeCounter++;
+			QueueSizeCounter++;
+			UE_LOG(LogTemp, Warning, TEXT("Projectile created of type %d"), type);
 		}
 		// if (AProjectileBase* Projectile = GetWorld()->SpawnActor<AProjectileBase>(TypesOfProjectile[static_cast<int>(type)]->GetClass(), FVector::ZeroVector, FRotator::ZeroRotator, spawnParams))
 		// {
@@ -86,4 +88,5 @@ void UProjectileDataManager::CreateProjectilePool(ProjectileType type)
 		// 	QueueSizeCounter++;
 		// }
 	}
+	CurrentPoolType = type;
 }

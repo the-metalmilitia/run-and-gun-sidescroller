@@ -17,7 +17,8 @@ AProjectileBase::AProjectileBase()
 	ProjectileMesh->SetupAttachment(Root);
 
 	MovementComponent = CreateDefaultSubobject<UProjectileMovementComponent>("MovementComponent");
-	MovementComponent->InitialSpeed = ProjectileSpeed;
+	MovementComponent->InitialSpeed = 0.0f;
+	MovementComponent->MaxSpeed = 0.0f;
 }
 
 // Called when the game starts or when spawned
@@ -32,5 +33,11 @@ void AProjectileBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+void AProjectileBase::SetVelocity() const
+{
+	MovementComponent->InitialSpeed = ProjectileSpeed;
+	MovementComponent->MaxSpeed = ProjectileSpeed;
 }
 
