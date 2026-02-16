@@ -4,7 +4,7 @@
 #include "ProjectileDataManager.h"
 
 void UProjectileDataManager::GetProjectileFromPool(ProjectileType Type,
-	TArray<AProjectileBase*> Projectiles, int Amount)
+	TArray<AProjectileBase*>& Projectiles, int Amount)
 {
 	if (Type == ProjectileType::Invalid
 		|| Type != GetCurrentProjectileType()
@@ -47,6 +47,7 @@ void UProjectileDataManager::ReturnProjectileToPool(AProjectileBase* Projectile)
 		return;
 	}
 
+	Projectile->Activate(false);
 	ProjectilePool.Enqueue(Projectile);
 	QueueSizeCounter++;
 }
@@ -70,10 +71,9 @@ void UProjectileDataManager::CreateProjectilePool(ProjectileType type)
 	QueueSizeCounter = 0;
 	for (int i = 0; i < MaxProjectilePoolSize; i++)
 	{
-		AProjectileBase* ProjectileToSpawn = GetWorld()->SpawnActor<AProjectileBase>(TypesOfProjectile[static_cast<int>(type)]->GetClass(), FVector::ZeroVector, FRotator::ZeroRotator);;
-		ProjectileToSpawn->SetActorEnableCollision(false);
-		ProjectileToSpawn->SetActorHiddenInGame(true);
-		ProjectileToSpawn->SetActorTickEnabled(false);
+		
+		AProjectileBase* ProjectileToSpawn = GetWorld()->SpawnActor<AProjectileBase>(TypesOfProjectile[static_cast<int>(type)], FVector::ZeroVector, FRotator::ZeroRotator);;
+		ProjectileToSpawn->Activate(false);
 		UE_LOG(LogTemp, Warning, TEXT("ProjectileToSpawn: %s"), *ProjectileToSpawn->GetName());
 
 		if(ProjectileToSpawn)

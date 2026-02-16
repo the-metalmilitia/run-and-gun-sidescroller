@@ -18,7 +18,7 @@ class RUNANDGUNSHOOTER_API UProjectileDataManager : public UDataAsset
 public:
 	void Initialize(UWorld* WorldContext);
 	void CreateProjectilePool(ProjectileType type);
-	void GetProjectileFromPool(ProjectileType Type, TArray<AProjectileBase*> Projectiles, int Amount);
+	auto GetProjectileFromPool(ProjectileType Type, TArray<AProjectileBase*>& Projectiles, int Amount) -> void;
 
 	UFUNCTION(BlueprintCallable)
 	void ReturnProjectileToPool(AProjectileBase* Projectile);

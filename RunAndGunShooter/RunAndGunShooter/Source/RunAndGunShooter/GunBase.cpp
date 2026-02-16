@@ -45,10 +45,7 @@ void AGunBase::Shoot()
 		{
 			Projectile->SetActorLocation(ProjectileSpawnPoint->GetComponentLocation());
 			Projectile->SetActorRotation(ProjectileSpawnPoint->GetComponentRotation());
-			Projectile->SetActorHiddenInGame(false);
-			Projectile->SetActorEnableCollision(true);
-			Projectile->SetActorTickEnabled(true);
-			Projectile->SetVelocity();
+			Projectile->Activate(true);
 			UE_LOG(LogTemp, Warning, TEXT("Projectile of type %d shot"), SpawnedProjectileType);
 		}
 	}

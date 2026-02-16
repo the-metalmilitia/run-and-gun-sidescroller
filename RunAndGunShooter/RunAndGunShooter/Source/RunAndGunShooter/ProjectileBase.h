@@ -34,7 +34,7 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	void SetVelocity() const;
+	void Activate(bool activate);
 
 	float GetProjectileSpeed() const { return ProjectileSpeed; }
 	float GetDamage() const { return Damage; }

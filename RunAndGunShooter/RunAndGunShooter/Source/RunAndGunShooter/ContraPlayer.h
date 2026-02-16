@@ -83,6 +83,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void TriggerPlayerDamage(float DamageAmount);
+
+	UFUNCTION(BlueprintCallable)
+	AGunBase* GetCurrentWeapon() const { return CurrentWeapon; }
 	
 	UFUNCTION(BlueprintPure)
 	bool IsDead() const { return CurrentHealth <= 0.0f; }

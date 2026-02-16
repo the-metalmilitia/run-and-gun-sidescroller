@@ -17,8 +17,7 @@ AProjectileBase::AProjectileBase()
 	ProjectileMesh->SetupAttachment(Root);
 
 	MovementComponent = CreateDefaultSubobject<UProjectileMovementComponent>("MovementComponent");
-	MovementComponent->InitialSpeed = 0.0f;
-	MovementComponent->MaxSpeed = 0.0f;
+	MovementComponent->Activate(false);
 }
 
 // Called when the game starts or when spawned
@@ -35,9 +34,12 @@ void AProjectileBase::Tick(float DeltaTime)
 
 }
 
-void AProjectileBase::SetVelocity() const
+void AProjectileBase::Activate(bool activate)
 {
-	MovementComponent->InitialSpeed = ProjectileSpeed;
-	MovementComponent->MaxSpeed = ProjectileSpeed;
+	MovementComponent->Activate(activate);
+	SetActorEnableCollision(activate);
+	SetActorHiddenInGame(!activate);
+	SetActorTickEnabled(activate);
+	MovementComponent->Velocity = activate ? GetActorForwardVector() * ProjectileSpeed : FVector::ZeroVector;
 }
 
