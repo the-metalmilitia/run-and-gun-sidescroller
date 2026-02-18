@@ -173,6 +173,10 @@ void AContraPlayer::ShootEvent(const FInputActionValue& Value)
 	if(CurrentWeapon)
 	{
 		CurrentWeapon->Shoot();
+		if(ShootMontage && GetMesh()->GetAnimInstance())
+		{
+			GetMesh()->GetAnimInstance()->Montage_Play(ShootMontage);
+		}
 	}
 }
 

@@ -71,6 +71,9 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	float CurrentHealth;
 
+	UPROPERTY(EditDefaultsOnly)
+	UAnimMontage* ShootMontage;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
