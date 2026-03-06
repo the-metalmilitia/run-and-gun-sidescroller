@@ -7,6 +7,8 @@
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "ProjectileBase.generated.h"
 
+class UProjectileDataManager;
+
 
 UENUM(BlueprintType)
 enum ProjectileType
@@ -15,7 +17,8 @@ enum ProjectileType
 	Default = 0,
 	Spread = 1,
 	MachineGun = 2,
-	Spinning = 3
+	Spinning = 3,
+    Homing = 4
 };
 UCLASS()
 class RUNANDGUNSHOOTER_API AProjectileBase : public AActor
@@ -35,6 +38,17 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	void Activate(bool activate);
+
+	void SetActive(bool bActive) { bIsActive = bActive; }
+
+	UFUNCTION(BlueprintPure, Category = "Projectile Pool")
+	bool IsProjectileActive() const { return bIsActive; }
+
+	UFUNCTION(BlueprintCallable, Category = "Projectile Pool")
+	void SetOwningPool(UProjectileDataManager* Pool) { OwningPool = Pool; }
+
+	UFUNCTION(BlueprintPure, Category = "Projectile Pool")
+	UProjectileDataManager* GetOwningPool() const { return OwningPool; }
 
 	float GetProjectileSpeed() const { return ProjectileSpeed; }
 	float GetDamage() const { return Damage; }
@@ -59,4 +73,10 @@ private:
 
 protected:
 	ProjectileType Type = ProjectileType::Default;
+
+private:
+	bool bIsActive = false;
+
+	UPROPERTY()
+	TObjectPtr<UProjectileDataManager> OwningPool;
 };

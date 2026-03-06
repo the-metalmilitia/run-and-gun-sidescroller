@@ -2,6 +2,7 @@
 
 
 #include "ProjectileBase.h"
+#include "ProjectileDataManager.h"
 
 
 // Sets default values
@@ -36,6 +37,7 @@ void AProjectileBase::Tick(float DeltaTime)
 
 void AProjectileBase::Activate(bool activate)
 {
+	bIsActive = activate;
 	MovementComponent->Activate(activate);
 	SetActorEnableCollision(activate);
 	SetActorHiddenInGame(!activate);

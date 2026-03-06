@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(\"D:\\\\Projects\\\\UnrealEngine\\\\UE_5.7\\\\Engine\\\\Build\\\\BatchFiles\\\\Build.bat\" RunAndGunShooterEditor:*)",
+      "Bash(dotnet:*)"
+    ]
+  }
+}

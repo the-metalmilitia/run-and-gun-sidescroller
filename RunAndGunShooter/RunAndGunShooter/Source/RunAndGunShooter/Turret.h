@@ -4,10 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
+#include "Components/BoxComponent.h"
+#include "ProjectileDataManager.h"
+#include "ShooterInterface.h"
 #include "Turret.generated.h"
 
 UCLASS()
-class RUNANDGUNSHOOTER_API ATurret : public APawn
+class RUNANDGUNSHOOTER_API ATurret : public APawn, public IShooterInterface
 {
 	GENERATED_BODY()
 
@@ -18,6 +21,7 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+    virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 
 public:	
 	// Called every frame
@@ -27,7 +31,10 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	void ActivateTurret(bool playerDetected);
-	void Shoot();
+
+	virtual void SetProjectile_Implementation(ProjectileType Type, int AmountPerShot) override;
+	virtual void Shoot_Implementation() override;
+	virtual UProjectileDataManager* GetProjectileDataManager_Implementation() const override;
 
 private:
 	UPROPERTY(VisibleAnywhere)
@@ -36,13 +43,35 @@ private:
 	UStaticMeshComponent* BaseMesh;
 	UPROPERTY(VisibleAnywhere)
 	UStaticMeshComponent* TurretMesh;
+	UPROPERTY(VisibleAnywhere)
+	UBoxComponent* DamageCollider;
+	UPROPERTY(VisibleAnywhere)
+    USceneComponent* ProjectileSpawnPoint;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditDefaultsOnly, Category = "Shooter")
+	TObjectPtr<UProjectileDataManager> ProjectileDataManager;
+
+	UPROPERTY(EditAnywhere, Category = "Turret Properties")
 	float FireRate;	
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = "Turret Properties")
 	float DetectionRange;
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = "Turret Properties")
 	float RotationSpeed;
+	UPROPERTY(EditAnywhere, Category = "Turret Properties")
+	float Health = 5;
 
+	void FireShot();
 
+	APawn* PlayerPawn = nullptr;
+	ProjectileType SpawnedProjectileType = ProjectileType::Default;
+    FVector DirectionToPlayer;
+    FVector LastKnownPlayerLocation = FVector::ZeroVector;
+    FRotator TargetRotation;
+    FRotator CurrentRotation;
+    FRotator NewRotation;
+    FTimerHandle FireTimerHandle;
+
+    bool IsAlive() const { return Health > 0; }
+
+	void Die();
 };

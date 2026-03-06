@@ -6,10 +6,11 @@
 #include "GameFramework/Actor.h"
 #include "ProjectileBase.h"
 #include "ProjectileDataManager.h"
+#include "ShooterInterface.h"
 #include "GunBase.generated.h"
 
 UCLASS(Blueprintable)
-class RUNANDGUNSHOOTER_API AGunBase : public AActor
+class RUNANDGUNSHOOTER_API AGunBase : public AActor, public IShooterInterface
 {
 	GENERATED_BODY()
 	
@@ -24,13 +25,13 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
-	UFUNCTION(BlueprintCallable)
-	void SetProjectile(ProjectileType type, int AmountPerShot = 1);
+	virtual void SetProjectile_Implementation(ProjectileType Type, int AmountPerShot) override;
 
 	UFUNCTION(BlueprintCallable)
 	ProjectileType GetProjectileType() const { return SpawnedProjectileType; }
 
-	virtual void Shoot();
+	virtual void Shoot_Implementation() override;
+	virtual UProjectileDataManager* GetProjectileDataManager_Implementation() const override;
 	
 protected:
 	UPROPERTY(VisibleAnywhere)
@@ -42,8 +43,8 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	USceneComponent* ProjectileSpawnPoint;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	UProjectileDataManager* ProjectileDataManager;
+	UPROPERTY(EditDefaultsOnly, Category = "Projectile Pool")
+	TObjectPtr<UProjectileDataManager> ProjectileDataManager;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	uint8 ProjectileAmountPerShot = 1;

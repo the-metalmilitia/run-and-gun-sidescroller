@@ -172,7 +172,8 @@ void AContraPlayer::ShootEvent(const FInputActionValue& Value)
 {
 	if(CurrentWeapon)
 	{
-		CurrentWeapon->Shoot();
+		//CurrentWeapon->Shoot();
+		IShooterInterface::Execute_Shoot(CurrentWeapon);
 		if(ShootMontage && GetMesh()->GetAnimInstance())
 		{
 			GetMesh()->GetAnimInstance()->Montage_Play(ShootMontage);

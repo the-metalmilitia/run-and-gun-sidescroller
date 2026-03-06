@@ -3,9 +3,9 @@
 
 #include "Rifle.h"
 
-void ARifle::Shoot()
+void ARifle::Shoot_Implementation()
 {
-	Super::Shoot();
+	Super::Shoot_Implementation();
 	ProjectileDataManager->GetProjectileFromPool(SpawnedProjectileType, ProjectilesPerShot, ProjectileAmountPerShot);
 
 	for (AProjectileBase* projectile : ProjectilesPerShot)

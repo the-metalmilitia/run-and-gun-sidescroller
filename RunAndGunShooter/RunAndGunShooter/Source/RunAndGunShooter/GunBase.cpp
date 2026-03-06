@@ -22,21 +22,20 @@ AGunBase::AGunBase()
 void AGunBase::BeginPlay()
 {
 	Super::BeginPlay();
-	ProjectileDataManager->Initialize(GetWorld());
-	SetProjectile(ProjectileType::Default);
+	SetProjectile_Implementation(ProjectileType::Default, 1);
 }
 
-void AGunBase::SetProjectile(ProjectileType type, int AmountPerShot)
+void AGunBase::SetProjectile_Implementation(ProjectileType Type, int AmountPerShot)
 {
 	ProjectileAmountPerShot = AmountPerShot;
-	SpawnedProjectileType = type;
+	SpawnedProjectileType = Type;
 	if(ProjectileDataManager)
 	{
-		ProjectileDataManager->CreateProjectilePool(type);
+		ProjectileDataManager->CreateProjectilePool(this, Type);
 	}
 }
 
-void AGunBase::Shoot()
+void AGunBase::Shoot_Implementation()
 {
 	ProjectileDataManager->GetProjectileFromPool(SpawnedProjectileType, ProjectilesPerShot, ProjectileAmountPerShot);
 	for (AProjectileBase* Projectile : ProjectilesPerShot)
@@ -45,11 +44,17 @@ void AGunBase::Shoot()
 		{
 			Projectile->SetActorLocation(ProjectileSpawnPoint->GetComponentLocation());
 			Projectile->SetActorRotation(ProjectileSpawnPoint->GetComponentRotation());
+			Projectile->SetOwningPool(ProjectileDataManager);
 			Projectile->Activate(true);
 			UE_LOG(LogTemp, Warning, TEXT("Projectile of type %d shot"), SpawnedProjectileType);
 		}
 	}
 	
+}
+
+UProjectileDataManager* AGunBase::GetProjectileDataManager_Implementation() const
+{
+	return ProjectileDataManager;
 }
 
 // Called every frame

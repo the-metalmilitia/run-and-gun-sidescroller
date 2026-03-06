@@ -3,12 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "ProjectileBase.h"
 #include "Engine/DataAsset.h"
+#include "ProjectileBase.h"
 #include "ProjectileDataManager.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS(Blueprintable)
 class RUNANDGUNSHOOTER_API UProjectileDataManager : public UDataAsset
@@ -16,32 +16,23 @@ class RUNANDGUNSHOOTER_API UProjectileDataManager : public UDataAsset
 	GENERATED_BODY()
 
 public:
-	void Initialize(UWorld* WorldContext);
-	void CreateProjectilePool(ProjectileType type);
-	auto GetProjectileFromPool(ProjectileType Type, TArray<AProjectileBase*>& Projectiles, int Amount) -> void;
+	UFUNCTION(BlueprintCallable, Category = "Projectile Pool")
+	void CreateProjectilePool(UObject* WorldContextObject, ProjectileType Type);
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "Projectile Pool")
+	void GetProjectileFromPool(ProjectileType Type, TArray<AProjectileBase*>& Projectiles, int Amount);
+
+	UFUNCTION(BlueprintCallable, Category = "Projectile Pool")
 	void ReturnProjectileToPool(AProjectileBase* Projectile);
 
-	ProjectileType GetCurrentProjectileType() const { return CurrentPoolType; }
-	
+	UFUNCTION(BlueprintCallable, Category = "Projectile Pool")
+	void ClearPools();
+
 private:
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, Category = "Projectile Pool")
 	TArray<TSubclassOf<AProjectileBase>> TypesOfProjectile;
 
-	UPROPERTY(EditDefaultsOnly)
-	int MaxProjectilePoolSize = 30;
+	static constexpr int32 PoolSize = 20;
 
-	int QueueSizeCounter = 0;
-	TQueue<AProjectileBase*> ProjectilePool;
-
-	UWorld* GetWorld() const override
-	{
-		return CurrentWorld;
-	}
-
-	ProjectileType CurrentPoolType = ProjectileType::Invalid;
-
-private:
-	UWorld* CurrentWorld = nullptr;
+	TMap<int32, TArray<AProjectileBase*>> ProjectilePools;
 };
