@@ -1,14 +1,19 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "Turret.h"
 #include "Kismet/GameplayStatics.h"
+#include "TurretAIController.h"
+#include "EnemyAIController.h"
 
 // Sets default values
 ATurret::ATurret()
 {
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+
+	// Ensure an AI Controller will be used for this pawn and that placed/spawned turrets get possessed
+	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
+	AIControllerClass = ATurretAIController::StaticClass();
 
 	Root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
 	SetRootComponent(Root);
@@ -32,6 +37,12 @@ void ATurret::BeginPlay()
 	Super::BeginPlay();
 	PlayerPawn = UGameplayStatics::GetPlayerPawn(this, 0);
 	SetProjectile_Implementation(ProjectileType::Default, 1);
+
+	// If an EnemyAIController (or derived) is controlling this turret, pass the BehaviorTree asset to it
+	if (AEnemyAIController* EnemyController = Cast<AEnemyAIController>(GetController()))
+	{
+		EnemyController->SetBehaviorTree(BehaviorTreeAsset);
+	}
 }
 
 float ATurret::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)

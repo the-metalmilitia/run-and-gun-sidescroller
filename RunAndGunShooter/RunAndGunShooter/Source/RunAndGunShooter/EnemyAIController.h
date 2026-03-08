@@ -6,6 +6,8 @@
 #include "AIController.h"
 #include "EnemyAIController.generated.h"
 
+class UBehaviorTree;
+
 /**
  * 
  */
@@ -14,6 +16,10 @@ class RUNANDGUNSHOOTER_API AEnemyAIController : public AAIController
 {
 	GENERATED_BODY()
 	
+public:
+	// Allow runtime assignment of a behavior tree asset
+	void SetBehaviorTree(UBehaviorTree* NewBehaviorTree);
+
 protected:
 	virtual void AttackPlayer();
 

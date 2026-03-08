@@ -42,3 +42,13 @@ void AEnemyAIController::Tick(float DeltaTime)
 void AEnemyAIController::AttackPlayer()
 {
 }
+
+void AEnemyAIController::SetBehaviorTree(UBehaviorTree* NewBehaviorTree)
+{
+	BehaviorTree = NewBehaviorTree;
+	// If the controller is already running in the world and a BehaviorTree was provided, run it immediately
+	if (BehaviorTree && GetWorld())
+	{
+		RunBehaviorTree(BehaviorTree);
+	}
+}

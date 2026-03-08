@@ -9,6 +9,8 @@
 #include "ShooterInterface.h"
 #include "Turret.generated.h"
 
+class UBehaviorTree;
+
 UCLASS()
 class RUNANDGUNSHOOTER_API ATurret : public APawn, public IShooterInterface
 {
@@ -50,6 +52,10 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Shooter")
 	TObjectPtr<UProjectileDataManager> ProjectileDataManager;
+
+	// AI: Behavior Tree asset that the turret will provide to its AI controller
+	UPROPERTY(EditAnywhere, Category = "AI")
+	UBehaviorTree* BehaviorTreeAsset;
 
 	UPROPERTY(EditAnywhere, Category = "Turret Properties")
 	float FireRate;	
