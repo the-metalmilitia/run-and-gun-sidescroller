@@ -4,18 +4,18 @@
 
 #include "CoreMinimal.h"
 #include "BehaviorTree/BTTaskNode.h"
-#include "BTTask_Shoot.generated.h"
+#include "BTTask_Crouch.generated.h"
 
 /**
- * Behavior Tree Task that calls the Shoot() function on a pawn implementing IShooterInterface.
+ * Behavior Tree Task to make the AI Character crouch.
  */
-UCLASS(DisplayName = "Shoot")
-class RUNANDGUNSHOOTER_API UBTTask_Shoot : public UBTTaskNode
+UCLASS(DisplayName = "Crouch")
+class RUNANDGUNSHOOTER_API UBTTask_Crouch : public UBTTaskNode
 {
 	GENERATED_BODY()
 
 public:
-	UBTTask_Shoot();
+	UBTTask_Crouch();
 
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
 };
