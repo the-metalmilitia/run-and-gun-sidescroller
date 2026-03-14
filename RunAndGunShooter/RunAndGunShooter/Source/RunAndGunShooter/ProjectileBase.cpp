@@ -3,6 +3,7 @@
 
 #include "ProjectileBase.h"
 #include "ProjectileDataManager.h"
+#include "DamageableInterface.h"
 
 
 // Sets default values
@@ -17,6 +18,9 @@ AProjectileBase::AProjectileBase()
 	ProjectileMesh = CreateDefaultSubobject<UStaticMeshComponent>("Mesh");
 	ProjectileMesh->SetupAttachment(Root);
 
+	CollisionSphere = CreateDefaultSubobject<USphereComponent>("CollisionMesh");
+	CollisionSphere->SetupAttachment(Root);
+
 	MovementComponent = CreateDefaultSubobject<UProjectileMovementComponent>("MovementComponent");
 	MovementComponent->Activate(false);
 }
@@ -25,7 +29,7 @@ AProjectileBase::AProjectileBase()
 void AProjectileBase::BeginPlay()
 {
 	Super::BeginPlay();
-	
+    CollisionSphere->OnComponentBeginOverlap.AddDynamic(this, &AProjectileBase::OnBeginOverlap);
 }
 
 // Called every frame
@@ -43,5 +47,13 @@ void AProjectileBase::Activate(bool activate)
 	SetActorHiddenInGame(!activate);
 	SetActorTickEnabled(activate);
 	MovementComponent->Velocity = activate ? GetActorForwardVector() * ProjectileSpeed : FVector::ZeroVector;
+}
+
+void AProjectileBase::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent,	AActor* OtherActor, UPrimitiveComponent* OtherComp,	int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if(OtherActor && OtherActor->Implements<UDamageableInterface>() && OtherActor != this)
+	{
+		IDamageableInterface::Execute_ApplyDamage(OtherActor, Damage, GetOwner());
+    }
 }
 

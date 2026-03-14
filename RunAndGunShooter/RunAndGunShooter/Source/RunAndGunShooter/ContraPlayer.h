@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "ContraPlayerController.h"
+#include "DamageableInterface.h"
 #include "GunBase.h"
 #include "InputMappingContext.h"
 #include "InputAction.h"
@@ -20,7 +21,7 @@ enum VerticalSwitchOption
 };
 
 UCLASS(Blueprintable)
-class RUNANDGUNSHOOTER_API AContraPlayer : public ACharacter
+class RUNANDGUNSHOOTER_API AContraPlayer : public ACharacter, public IDamageableInterface
 {
 	GENERATED_BODY()
 
@@ -93,8 +94,12 @@ public:
 	UFUNCTION(BlueprintPure)
 	bool IsDead() const { return CurrentHealth <= 0.0f; }
 
-	
+	virtual void ApplyDamage_Implementation(float DamageAmount, AActor* DamageCauser) override;
+	virtual bool IsAlive_Implementation() const override;
+
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
+
+	void Shoot();
 	
 
 private:

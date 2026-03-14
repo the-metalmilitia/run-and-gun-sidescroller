@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
 #include "Components/BoxComponent.h"
+#include "DamageableInterface.h"
 #include "ProjectileDataManager.h"
 #include "ShooterInterface.h"
 #include "Turret.generated.h"
@@ -12,7 +13,7 @@
 class UBehaviorTree;
 
 UCLASS()
-class RUNANDGUNSHOOTER_API ATurret : public APawn, public IShooterInterface
+class RUNANDGUNSHOOTER_API ATurret : public APawn, public IShooterInterface, public IDamageableInterface
 {
 	GENERATED_BODY()
 
@@ -23,7 +24,6 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-    virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 
 public:	
 	// Called every frame
@@ -37,6 +37,9 @@ public:
 	virtual void SetProjectile_Implementation(ProjectileType Type, int AmountPerShot) override;
 	virtual void Shoot_Implementation() override;
 	virtual UProjectileDataManager* GetProjectileDataManager_Implementation() const override;
+
+	virtual void ApplyDamage_Implementation(float DamageAmount, AActor* DamageCauser) override;
+	virtual bool IsAlive_Implementation() const override;
 
 private:
 	UPROPERTY(VisibleAnywhere)
@@ -76,8 +79,6 @@ private:
     FRotator CurrentRotation;
     FRotator NewRotation;
     FTimerHandle FireTimerHandle;
-
-    bool IsAlive() const { return Health > 0; }
 
 	void Die();
 };

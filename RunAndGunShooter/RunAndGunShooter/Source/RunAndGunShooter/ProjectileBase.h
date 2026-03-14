@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "GameFramework/ProjectileMovementComponent.h"
+#include <Components/SphereComponent.h>
 #include "ProjectileBase.generated.h"
 
 class UProjectileDataManager;
@@ -41,6 +42,14 @@ public:
 
 	void SetActive(bool bActive) { bIsActive = bActive; }
 
+	UFUNCTION()
+	void OnBeginOverlap(UPrimitiveComponent* OverlappedComponent,
+		AActor* OtherActor,
+		UPrimitiveComponent* OtherComp,
+		int32 OtherBodyIndex,
+		bool bFromSweep,
+		const FHitResult& SweepResult);
+
 	UFUNCTION(BlueprintPure, Category = "Projectile Pool")
 	bool IsProjectileActive() const { return bIsActive; }
 
@@ -61,6 +70,9 @@ private:
 
 	UPROPERTY(VisibleAnywhere)
 	UStaticMeshComponent* ProjectileMesh;
+
+	UPROPERTY(VisibleAnywhere)
+	USphereComponent* CollisionSphere;
 
 	UPROPERTY(VisibleAnywhere)
 	UProjectileMovementComponent* MovementComponent;

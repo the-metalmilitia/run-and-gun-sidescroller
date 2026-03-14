@@ -98,18 +98,31 @@ void AContraPlayer::TriggerPlayerDamage(float DamageAmount)
 float AContraPlayer::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent,
                                 class AController* EventInstigator, AActor* DamageCauser)
 {
-	float DamageApplied = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
-	CurrentHealth -= DamageApplied;
+	const float ActualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	ApplyDamage_Implementation(ActualDamage, DamageCauser);
+	return ActualDamage;
+}
 
-	if (IsDead())
+void AContraPlayer::ApplyDamage_Implementation(float DamageAmount, AActor* DamageCauser)
+{
+	if (!IsAlive_Implementation() || DamageCauser == this)
+	{
+		return;
+	}
+
+	CurrentHealth = FMath::Max(0.0f, CurrentHealth - DamageAmount);
+
+	if (!IsAlive_Implementation())
 	{
 		PlayerController->CallPlayerDeath();
-		
 		DetachFromControllerPendingDestroy();
 		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		return 0.0f;
 	}
-	return  DamageApplied;
+}
+
+bool AContraPlayer::IsAlive_Implementation() const
+{
+	return CurrentHealth > 0.0f;
 }
 
 void AContraPlayer::MoveEvent(const FInputActionValue& Value)
@@ -170,11 +183,16 @@ void AContraPlayer::JumpEvent(const FInputActionValue& Value)
 
 void AContraPlayer::ShootEvent(const FInputActionValue& Value)
 {
-	if(CurrentWeapon)
+	Shoot();
+}
+
+void AContraPlayer::Shoot()
+{
+	if (CurrentWeapon)
 	{
 		//CurrentWeapon->Shoot();
 		IShooterInterface::Execute_Shoot(CurrentWeapon);
-		if(ShootMontage && GetMesh()->GetAnimInstance())
+		if (ShootMontage && GetMesh()->GetAnimInstance())
 		{
 			GetMesh()->GetAnimInstance()->Montage_Play(ShootMontage);
 		}

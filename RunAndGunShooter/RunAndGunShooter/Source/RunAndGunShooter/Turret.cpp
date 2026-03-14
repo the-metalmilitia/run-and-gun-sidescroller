@@ -45,9 +45,24 @@ void ATurret::BeginPlay()
 	}
 }
 
-float ATurret::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+void ATurret::ApplyDamage_Implementation(float DamageAmount, AActor* DamageCauser)
 {
-	return 0.0f;
+	if (!IsAlive_Implementation() || DamageCauser == this)
+	{
+		return;
+	}
+
+	Health = FMath::Max(0.0f, Health - DamageAmount);
+
+	if (!IsAlive_Implementation())
+	{
+		Die();
+	}
+}
+
+bool ATurret::IsAlive_Implementation() const
+{
+	return Health > 0.0f;
 }
 
 // Called every frame
@@ -71,7 +86,7 @@ void ATurret::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 void ATurret::ActivateTurret(bool playerDetected)
 {
-	if (!playerDetected || !PlayerPawn || !IsAlive())
+	if (!playerDetected || !PlayerPawn || !IsAlive_Implementation())
 	{
 		GetWorldTimerManager().ClearTimer(FireTimerHandle);
 		return;
@@ -105,7 +120,7 @@ void ATurret::SetProjectile_Implementation(ProjectileType Type, int AmountPerSho
 
 void ATurret::Shoot_Implementation()
 {
-	if (!ProjectileDataManager || !IsAlive()) return;
+	if (!ProjectileDataManager || !IsAlive_Implementation()) return;
 
 	TArray<AProjectileBase*> Projectiles;
 	ProjectileDataManager->GetProjectileFromPool(SpawnedProjectileType, Projectiles, 1);
@@ -138,4 +153,6 @@ void ATurret::FireShot()
 
 void ATurret::Die()
 {
+	GetWorldTimerManager().ClearTimer(FireTimerHandle);
+	Destroy();
 }

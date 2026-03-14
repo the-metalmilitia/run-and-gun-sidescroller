@@ -1,18 +1,17 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
-#include "BTTask_Crouch.h"
+#include "BTTask_UnCrouch.h"
 #include "AIController.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "BehaviorTree/BehaviorTreeComponent.h"
 
-UBTTask_Crouch::UBTTask_Crouch()
+UBTTask_UnCrouch::UBTTask_UnCrouch()
 {
-	NodeName = TEXT("Crouch");
+	NodeName = TEXT("UnCrouch");
 }
 
-EBTNodeResult::Type UBTTask_Crouch::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
+EBTNodeResult::Type UBTTask_UnCrouch::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
 	AAIController* AIController = OwnerComp.GetAIOwner();
 	if (!IsValid(AIController))
@@ -26,17 +25,11 @@ EBTNodeResult::Type UBTTask_Crouch::ExecuteTask(UBehaviorTreeComponent& OwnerCom
 		return EBTNodeResult::Failed;
 	}
 
-	if (Character->GetCharacterMovement()->IsCrouching())
+	if (!Character->GetCharacterMovement()->IsCrouching())
 	{
 		return EBTNodeResult::Succeeded;
 	}
 
-	if (!Character->CanCrouch())
-	{
-		return EBTNodeResult::Failed;
-	}
-
-	Character->Crouch();
+	Character->UnCrouch();
 	return EBTNodeResult::Succeeded;
 }
-
