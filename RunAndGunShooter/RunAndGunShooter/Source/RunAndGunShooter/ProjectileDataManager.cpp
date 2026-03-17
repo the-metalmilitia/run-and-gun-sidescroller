@@ -17,12 +17,15 @@ void UProjectileDataManager::CreateProjectilePool(UObject* WorldContextObject, P
 
 	TArray<AProjectileBase*>& Pool = ProjectilePools.FindOrAdd(static_cast<int32>(Type));
 
-	for (AProjectileBase* Projectile : Pool)
+	if(Pool.Num() > 0)
 	{
-		if (IsValid(Projectile)) Projectile->Destroy();
-	}
-	Pool.Empty();
-	Pool.Reserve(PoolSize);
+		for (AProjectileBase* Projectile : Pool)
+		{
+			if (IsValid(Projectile)) Projectile->Destroy();
+		}
+		Pool.Empty();
+		Pool.Reserve(PoolSize);
+    }
 
 	for (int32 i = 0; i < PoolSize; i++)
 	{

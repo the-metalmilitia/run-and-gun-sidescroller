@@ -15,5 +15,9 @@ class RUNANDGUNSHOOTER_API ARunnerEnemyAIController : public AEnemyAIController
 	GENERATED_BODY()
 	
 protected:
+	virtual void OnPossess(APawn* InPawn) override;
 	virtual void AttackPlayer() override;
+
+private:
+	void StartMovement();
 };
