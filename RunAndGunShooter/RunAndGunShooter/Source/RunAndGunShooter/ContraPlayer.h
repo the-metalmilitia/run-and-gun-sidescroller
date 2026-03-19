@@ -109,6 +109,7 @@ private:
 	void ShootEvent(const FInputActionValue& Value);
 	void LookEvent(const FInputActionValue& value);
 
+	void Die();
 	void SwitchPlatform();
 
 	VerticalSwitchOption VerticalSwitch = VerticalSwitchOption::None;

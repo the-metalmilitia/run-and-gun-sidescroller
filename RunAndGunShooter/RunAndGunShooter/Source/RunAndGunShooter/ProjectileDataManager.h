@@ -7,6 +7,15 @@
 #include "ProjectileBase.h"
 #include "ProjectileDataManager.generated.h"
 
+USTRUCT()
+struct FProjectilePool
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+	TArray<AProjectileBase*> Projectiles;
+};
+
 /**
  *
  */
@@ -34,5 +43,6 @@ private:
 
 	static constexpr int32 PoolSize = 20;
 
-	TMap<int32, TArray<AProjectileBase*>> ProjectilePools;
+	UPROPERTY()
+	TMap<int32, FProjectilePool> ProjectilePools;
 };

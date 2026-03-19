@@ -15,9 +15,9 @@ void UProjectileDataManager::CreateProjectilePool(UObject* WorldContextObject, P
 		return;
 	}
 
-	TArray<AProjectileBase*>& Pool = ProjectilePools.FindOrAdd(static_cast<int32>(Type));
+	TArray<AProjectileBase*>& Pool = ProjectilePools.FindOrAdd(static_cast<int32>(Type)).Projectiles;
 
-	if(Pool.Num() > 0)
+	if (Pool.Num() > 0)
 	{
 		for (AProjectileBase* Projectile : Pool)
 		{
@@ -25,7 +25,7 @@ void UProjectileDataManager::CreateProjectilePool(UObject* WorldContextObject, P
 		}
 		Pool.Empty();
 		Pool.Reserve(PoolSize);
-    }
+	}
 
 	for (int32 i = 0; i < PoolSize; i++)
 	{
@@ -45,7 +45,7 @@ void UProjectileDataManager::ClearPools()
 {
 	for (auto& Pair : ProjectilePools)
 	{
-		for (AProjectileBase* Projectile : Pair.Value)
+		for (AProjectileBase* Projectile : Pair.Value.Projectiles)
 		{
 			if (IsValid(Projectile)) Projectile->Destroy();
 		}
@@ -55,25 +55,25 @@ void UProjectileDataManager::ClearPools()
 
 void UProjectileDataManager::GetProjectileFromPool(ProjectileType Type, TArray<AProjectileBase*>& Projectiles, int Amount)
 {
-	TArray<AProjectileBase*>* Pool = ProjectilePools.Find(static_cast<int32>(Type));
+	FProjectilePool* PoolEntry = ProjectilePools.Find(static_cast<int32>(Type));
 
-	if (!Pool
+	if (!PoolEntry
 		|| Type == ProjectileType::Invalid
 		|| Amount <= 0
-		|| Pool->Num() == 0
-		|| Amount > Pool->Num())
+		|| PoolEntry->Projectiles.Num() == 0
+		|| Amount > PoolEntry->Projectiles.Num())
 	{
 		UE_LOG(LogTemp, Warning, TEXT("GetProjectileFromPool failed: Type=%d, Amount=%d, PoolSize=%d"),
-			Type, Amount, Pool ? Pool->Num() : 0);
+			Type, Amount, PoolEntry ? PoolEntry->Projectiles.Num() : 0);
 		return;
 	}
 
 	Projectiles.Empty();
 	Projectiles.Reserve(Amount);
 
-	while (Amount > 0 && Pool->Num() > 0)
+	while (Amount > 0 && PoolEntry->Projectiles.Num() > 0)
 	{
-		Projectiles.Add(Pool->Pop());
+		Projectiles.Add(PoolEntry->Projectiles.Pop());
 		Amount--;
 	}
 }
@@ -82,10 +82,10 @@ void UProjectileDataManager::ReturnProjectileToPool(AProjectileBase* Projectile)
 {
 	if (!IsValid(Projectile)) return;
 
-	TArray<AProjectileBase*>* Pool = ProjectilePools.Find(static_cast<int32>(Projectile->GetProjectileType()));
+	FProjectilePool* PoolEntry = ProjectilePools.Find(static_cast<int32>(Projectile->GetProjectileType()));
 
-	if (!Pool || Pool->Num() >= PoolSize) return;
+	if (!PoolEntry || PoolEntry->Projectiles.Num() >= PoolSize) return;
 
 	Projectile->Activate(false);
-	Pool->Add(Projectile);
+	PoolEntry->Projectiles.Add(Projectile);
 }

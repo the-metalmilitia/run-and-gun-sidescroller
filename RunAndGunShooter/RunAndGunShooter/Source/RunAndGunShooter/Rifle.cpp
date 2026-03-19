@@ -5,17 +5,16 @@
 
 void ARifle::Shoot_Implementation()
 {
-	Super::Shoot_Implementation();
 	ProjectileDataManager->GetProjectileFromPool(SpawnedProjectileType, ProjectilesPerShot, ProjectileAmountPerShot);
 
-	for (AProjectileBase* projectile : ProjectilesPerShot)
+	for (AProjectileBase* Projectile : ProjectilesPerShot)
 	{
-		if (projectile)
+		if (Projectile)
 		{
-			projectile->SetActorLocation(ProjectileSpawnPoint->GetComponentLocation());
-			projectile->SetActorRotation(GetActorRotation());
-			projectile->SetActorHiddenInGame(false);
-			projectile->SetActorEnableCollision(true);
+			Projectile->SetActorLocation(ProjectileSpawnPoint->GetComponentLocation());
+			Projectile->SetActorRotation(ProjectileSpawnPoint->GetComponentRotation());
+			Projectile->SetOwningPool(ProjectileDataManager);
+			Projectile->Activate(true);
 		}
 	}
 }

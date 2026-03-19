@@ -112,7 +112,7 @@ void ATurret::ActivateTurret(bool playerDetected)
 void ATurret::SetProjectile_Implementation(ProjectileType Type, int AmountPerShot)
 {
 	SpawnedProjectileType = Type;
-	if (ProjectileDataManager)
+	if (IsValid(ProjectileDataManager))
 	{
 		ProjectileDataManager->CreateProjectilePool(this, Type);
 	}

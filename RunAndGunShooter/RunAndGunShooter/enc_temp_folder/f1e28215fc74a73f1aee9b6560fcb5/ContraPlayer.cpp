@@ -123,40 +123,6 @@ bool AContraPlayer::IsAlive_Implementation() const
 	return CurrentHealth > 0.0f;
 }
 
-void AContraPlayer::Die()
-{
-	// Stop all movement immediately
-	GetCharacterMovement()->DisableMovement();
-
-	// Clear projectile pool and destroy the weapon
-	if (IsValid(CurrentWeapon))
-	{
-		UProjectileDataManager* PoolManager = IShooterInterface::Execute_GetProjectileDataManager(CurrentWeapon);
-		if (IsValid(PoolManager))
-		{
-			PoolManager->ClearPools();
-		}
-		CurrentWeapon->Destroy();
-		CurrentWeapon = nullptr;
-	}
-
-	// Remove input so the player can't keep shooting/moving after death
-	if (PlayerController)
-	{
-		if (UEnhancedInputLocalPlayerSubsystem* SubSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
-		{
-			SubSystem->RemoveMappingContext(InputMappingContext);
-		}
-
-		PlayerController->bAutoManageActiveCameraTarget = false;
-		PlayerController->CallPlayerDeath();
-		DetachFromControllerPendingDestroy();
-	}
-
-	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	Destroy();
-}
-
 void AContraPlayer::MoveEvent(const FInputActionValue& Value)
 {
 	if (IsCrouched())
