@@ -4,6 +4,7 @@
 #include "ProjectileBase.h"
 #include "ProjectileDataManager.h"
 #include "DamageableInterface.h"
+#include "Kismet/GameplayStatics.h"
 
 
 // Sets default values
@@ -47,6 +48,12 @@ void AProjectileBase::Activate(bool activate)
 	SetActorHiddenInGame(!activate);
 	SetActorTickEnabled(activate);
 	MovementComponent->Velocity = activate ? GetActorForwardVector() * ProjectileSpeed : FVector::ZeroVector;
+
+	if (activate && TrailVFX)
+	{
+		UGameplayStatics::SpawnEmitterAtLocation(this, TrailVFX,
+			GetActorLocation(), GetActorRotation());
+	}
 }
 
 void AProjectileBase::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent,	AActor* OtherActor, UPrimitiveComponent* OtherComp,	int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -54,6 +61,12 @@ void AProjectileBase::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent,	A
 	if(OtherActor && OtherActor->Implements<UDamageableInterface>() && OtherActor != this)
 	{
 		IDamageableInterface::Execute_ApplyDamage(OtherActor, Damage, GetOwner());
+
+		if (ImpactVFX)
+		{
+			UGameplayStatics::SpawnEmitterAtLocation(this, ImpactVFX,
+				GetActorLocation(), FRotator::ZeroRotator);
+		}
     }
 }
 

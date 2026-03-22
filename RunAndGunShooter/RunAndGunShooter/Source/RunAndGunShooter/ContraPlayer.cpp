@@ -4,6 +4,7 @@
 #include "ContraPlayer.h"
 
 #include "Components/CapsuleComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "Engine/DamageEvents.h"
 #include "EnhancedInput/Public/EnhancedInputSubsystems.h"
 #include "EnhancedInput/Public/EnhancedInputComponent.h"
@@ -24,6 +25,7 @@ void AContraPlayer::BeginPlay()
 	CurrentHealth = MaxHealth;
 	
 	PlayerController = Cast<AContraPlayerController>(Controller);
+	GameMode = Cast<AContraGameMode>(GetWorld()->GetAuthGameMode());
 	if (PlayerController)
 	{
 		if (UEnhancedInputLocalPlayerSubsystem* SubSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
@@ -105,7 +107,7 @@ float AContraPlayer::TakeDamage(float DamageAmount, struct FDamageEvent const& D
 
 void AContraPlayer::ApplyDamage_Implementation(float DamageAmount, AActor* DamageCauser)
 {
-	if (!IsAlive_Implementation() || DamageCauser == this)
+	if (!IsAlive_Implementation() || DamageCauser == this || bIsInvincible)
 	{
 		return;
 	}
@@ -125,36 +127,97 @@ bool AContraPlayer::IsAlive_Implementation() const
 
 void AContraPlayer::Die()
 {
-	// Stop all movement immediately
-	GetCharacterMovement()->DisableMovement();
+	const bool bHasLivesRemaining = IsValid(GameMode) && GameMode->Lives > 0;
 
-	// Clear projectile pool and destroy the weapon
-	if (IsValid(CurrentWeapon))
+	if (bHasLivesRemaining && IsValid(PlayerController))
 	{
-		UProjectileDataManager* PoolManager = IShooterInterface::Execute_GetProjectileDataManager(CurrentWeapon);
-		if (IsValid(PoolManager))
-		{
-			PoolManager->ClearPools();
-		}
-		CurrentWeapon->Destroy();
-		CurrentWeapon = nullptr;
-	}
+		RespawnLocation = GetActorLocation();
 
-	// Remove input so the player can't keep shooting/moving after death
-	if (PlayerController)
-	{
-		if (UEnhancedInputLocalPlayerSubsystem* SubSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
+		// Respawn path: destroy weapon only (its BeginPlay will recreate the pool)
+		if (IsValid(CurrentWeapon))
 		{
-			SubSystem->RemoveMappingContext(InputMappingContext);
+			CurrentWeapon->Destroy();
+			CurrentWeapon = nullptr;
 		}
 
-		PlayerController->bAutoManageActiveCameraTarget = false;
-		PlayerController->CallPlayerDeath();
-		DetachFromControllerPendingDestroy();
+		GameMode->Lives--;
+		Respawn();
 	}
+	else
+	{
+		// Final death path: full cleanup
+		GetCharacterMovement()->DisableMovement();
 
-	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	Destroy();
+		if (IsValid(CurrentWeapon))
+		{
+			UProjectileDataManager* PoolManager = IShooterInterface::Execute_GetProjectileDataManager(CurrentWeapon);
+			if (IsValid(PoolManager))
+			{
+				PoolManager->ClearPools();
+			}
+			CurrentWeapon->Destroy();
+			CurrentWeapon = nullptr;
+		}
+
+		if (PlayerController)
+		{
+			if (UEnhancedInputLocalPlayerSubsystem* SubSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
+			{
+				SubSystem->RemoveMappingContext(InputMappingContext);
+			}
+
+			PlayerController->bAutoManageActiveCameraTarget = false;
+			PlayerController->CallPlayerDeath();
+			DetachFromControllerPendingDestroy();
+		}
+
+		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+		if (DeathVFX)
+		{
+			UGameplayStatics::SpawnEmitterAtLocation(this, DeathVFX,
+				GetActorLocation(), FRotator::ZeroRotator);
+		}
+
+		Destroy();
+	}
+}
+
+void AContraPlayer::Respawn()
+{
+	SetActorLocation(RespawnLocation + FVector(0.0f, 0.0f, RespawnDropHeight));
+	CurrentHealth = MaxHealth;
+
+	bIsInvincible = true;
+	GetWorldTimerManager().SetTimer(InvincibilityTimerHandle,
+		[this]()
+		{
+			bIsInvincible = false;
+			GetWorldTimerManager().ClearTimer(BlinkTimerHandle);
+			GetMesh()->SetVisibility(true);
+		},
+		RespawnInvincibilityDuration, false);
+
+	GetWorldTimerManager().SetTimer(BlinkTimerHandle,
+		[this]() { GetMesh()->SetVisibility(!GetMesh()->IsVisible()); },
+		BlinkInterval, /*bLoop=*/true);
+	GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+
+	if (Rifle != nullptr)
+	{
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.Owner = this;
+		SpawnParams.Instigator = GetInstigator();
+		AGunBase* newGun = GetWorld()->SpawnActor<AGunBase>(Rifle, SpawnParams);
+
+		if (newGun)
+		{
+			FAttachmentTransformRules AttachmentRule(EAttachmentRule::SnapToTarget, true);
+			newGun->AttachToComponent(GetMesh(), AttachmentRule, TEXT("WeaponSocket"));
+			CurrentWeapon = newGun;
+		}
+	}
 }
 
 void AContraPlayer::MoveEvent(const FInputActionValue& Value)

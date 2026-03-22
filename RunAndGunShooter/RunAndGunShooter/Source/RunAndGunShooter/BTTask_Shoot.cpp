@@ -5,7 +5,6 @@
 #include "GameFramework/Pawn.h"
 #include "ShooterInterface.h"
 #include "BehaviorTree/BehaviorTreeComponent.h"
-#include "ContraPlayer.h"
 
 UBTTask_Shoot::UBTTask_Shoot()
 {
@@ -21,14 +20,40 @@ EBTNodeResult::Type UBTTask_Shoot::ExecuteTask(UBehaviorTreeComponent& OwnerComp
 		return EBTNodeResult::Failed;
 	}
 
-	AContraPlayer* Character = static_cast<AContraPlayer*>(AIController->GetCharacter());
-	if (!Character)
+	APawn* Pawn = AIController->GetPawn();
+	if (!Pawn)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("UBTTASK_Shoot: Character not found"));
+		UE_LOG(LogTemp, Warning, TEXT("UBTTask_Shoot: No Pawn"));
 		return EBTNodeResult::Failed;
 	}
 
-	Character->Shoot();
+	// Prefer the pawn itself; fall back to any attached actor (e.g. GunBase).
+	UObject* Shooter = nullptr;
+	if (Pawn->Implements<UShooterInterface>())
+	{
+		Shooter = Pawn;
+	}
+	else
+	{
+		TArray<AActor*> AttachedActors;
+		Pawn->GetAttachedActors(AttachedActors);
+		for (AActor* Attached : AttachedActors)
+		{
+			if (Attached->Implements<UShooterInterface>())
+			{
+				Shooter = Attached;
+				break;
+			}
+		}
+	}
+
+	if (!Shooter)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UBTTask_Shoot: No IShooterInterface found on pawn or its attached actors"));
+		return EBTNodeResult::Failed;
+	}
+
+	IShooterInterface::Execute_Shoot(Shooter);
 
 	return EBTNodeResult::Succeeded;
 }

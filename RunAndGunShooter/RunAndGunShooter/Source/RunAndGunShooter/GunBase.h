@@ -7,6 +7,8 @@
 #include "ProjectileBase.h"
 #include "ProjectileDataManager.h"
 #include "ShooterInterface.h"
+class UParticleSystem;
+
 #include "GunBase.generated.h"
 
 UCLASS(Blueprintable)
@@ -32,6 +34,9 @@ public:
 
 	virtual void Shoot_Implementation() override;
 	virtual UProjectileDataManager* GetProjectileDataManager_Implementation() const override;
+
+	USceneComponent* GetProjectileSpawnPoint() const { return ProjectileSpawnPoint; }
+	void SnapProjectileSpawnPoint(USceneComponent* TargetComponent, FName SocketName);
 	
 protected:
 	UPROPERTY(VisibleAnywhere)
@@ -48,6 +53,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	uint8 ProjectileAmountPerShot = 1;
+
+	UPROPERTY(EditDefaultsOnly, Category = "VFX")
+	UParticleSystem* MuzzleFlashVFX = nullptr;
 
 protected:
 	ProjectileType SpawnedProjectileType;

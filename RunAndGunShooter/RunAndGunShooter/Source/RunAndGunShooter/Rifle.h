@@ -14,8 +14,6 @@ class RUNANDGUNSHOOTER_API ARifle : public AGunBase
 {
 	GENERATED_BODY()
 
-public:
-	virtual void Shoot_Implementation() override;
 
-	
+
 };

@@ -2,6 +2,7 @@
 
 
 #include "GunBase.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 AGunBase::AGunBase()
@@ -49,12 +50,28 @@ void AGunBase::Shoot_Implementation()
 			UE_LOG(LogTemp, Warning, TEXT("Projectile of type %d shot"), SpawnedProjectileType);
 		}
 	}
-	
+
+	if (MuzzleFlashVFX)
+	{
+		UGameplayStatics::SpawnEmitterAtLocation(this, MuzzleFlashVFX,
+			ProjectileSpawnPoint->GetComponentLocation(),
+			ProjectileSpawnPoint->GetComponentRotation());
+	}
 }
 
 UProjectileDataManager* AGunBase::GetProjectileDataManager_Implementation() const
 {
 	return ProjectileDataManager;
+}
+
+void AGunBase::SnapProjectileSpawnPoint(USceneComponent* TargetComponent, FName SocketName)
+{
+	if (ProjectileSpawnPoint && TargetComponent)
+	{
+		ProjectileSpawnPoint->AttachToComponent(TargetComponent,
+			FAttachmentTransformRules::SnapToTargetNotIncludingScale,
+			SocketName);
+	}
 }
 
 // Called every frame

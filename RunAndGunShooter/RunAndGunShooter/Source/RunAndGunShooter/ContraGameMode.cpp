@@ -6,6 +6,4 @@
 void AContraGameMode::StartPlay()
 {
 	Super::StartPlay();
-
-	CurrentLives = MaxLives;
 }

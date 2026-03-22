@@ -9,6 +9,8 @@
 #include "InputMappingContext.h"
 #include "InputAction.h"
 #include "GameFramework/Character.h"
+class UParticleSystem;
+
 #include "ContraPlayer.generated.h"
 
 UENUM(BlueprintType)
@@ -75,7 +77,19 @@ protected:
 	UPROPERTY(EditDefaultsOnly)
 	UAnimMontage* ShootMontage;
 
-public:	
+	UPROPERTY(EditDefaultsOnly, Category = "VFX")
+	UParticleSystem* DeathVFX = nullptr;
+
+	UPROPERTY(EditAnywhere, Category = "Lives")
+	float RespawnDropHeight = 500.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Lives")
+	float RespawnInvincibilityDuration = 3.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Lives")
+	float BlinkInterval = 0.1f;
+
+public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 	
@@ -90,6 +104,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	AGunBase* GetCurrentWeapon() const { return CurrentWeapon; }
+
+	UFUNCTION(BlueprintPure)
+	bool HasCurrentWeapon() const { return IsValid(CurrentWeapon) && CurrentWeapon->Implements<UShooterInterface>(); }
 	
 	UFUNCTION(BlueprintPure)
 	bool IsDead() const { return CurrentHealth <= 0.0f; }
@@ -110,12 +127,20 @@ private:
 	void LookEvent(const FInputActionValue& value);
 
 	void Die();
+	void Respawn();
 	void SwitchPlatform();
+
+	FVector RespawnLocation;
+
+	FTimerHandle InvincibilityTimerHandle;
+	FTimerHandle BlinkTimerHandle;
+	bool bIsInvincible = false;
 
 	VerticalSwitchOption VerticalSwitch = VerticalSwitchOption::None;
 	VerticalSwitchOption AllowedSwitch = VerticalSwitchOption::Bothways;
 
 	AContraPlayerController* PlayerController = nullptr;
+	AContraGameMode* GameMode = nullptr;
 
 	UPROPERTY(VisibleAnywhere)
 	AGunBase* CurrentWeapon = nullptr;

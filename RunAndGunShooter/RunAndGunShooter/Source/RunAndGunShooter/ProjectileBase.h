@@ -9,6 +9,7 @@
 #include "ProjectileBase.generated.h"
 
 class UProjectileDataManager;
+class UParticleSystem;
 
 
 UENUM(BlueprintType)
@@ -82,6 +83,12 @@ private:
 
 	UPROPERTY(EditDefaultsOnly)
 	float Damage = 10.0f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "VFX")
+	UParticleSystem* TrailVFX = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, Category = "VFX")
+	UParticleSystem* ImpactVFX = nullptr;
 
 protected:
 	ProjectileType Type = ProjectileType::Default;

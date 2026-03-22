@@ -2,6 +2,7 @@
 
 
 #include "RunnerEnemyAIController.h"
+#include "Kismet/GameplayStatics.h"
 
 void ARunnerEnemyAIController::OnPossess(APawn* InPawn)
 {
@@ -11,7 +12,20 @@ void ARunnerEnemyAIController::OnPossess(APawn* InPawn)
 
 void ARunnerEnemyAIController::StartMovement()
 {
-	MoveToLocation(FVector(-2100, -2360, 343));
+	APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+	if (!PC) return;
+
+	int32 ViewportSizeX, ViewportSizeY;
+	PC->GetViewportSize(ViewportSizeX, ViewportSizeY);
+
+	FVector WorldLocation, WorldDirection;
+	PC->DeprojectScreenPositionToWorld(0.f, ViewportSizeY * 0.5f, WorldLocation, WorldDirection);
+
+	APawn* ControlledPawn = GetPawn();
+	FVector PawnLocation = ControlledPawn ? ControlledPawn->GetActorLocation() : FVector::ZeroVector;
+	FVector TargetLocation(WorldLocation.X - 1000.0f, PawnLocation.Y, PawnLocation.Z);
+
+	MoveToLocation(TargetLocation);
 }
 
 void ARunnerEnemyAIController::AttackPlayer()
