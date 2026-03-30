@@ -41,6 +41,7 @@ void ATurret::BeginPlay()
 		if (CurrentWeapon)
 		{
 			CurrentWeapon->AttachToActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+			CurrentWeapon->SetGunOwnerActor(this);
 		}
 	}
 }

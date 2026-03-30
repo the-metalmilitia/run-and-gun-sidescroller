@@ -30,7 +30,7 @@ void ATurretGun::Shoot_Implementation()
 			Projectile->SetActorLocation(SpawnLocation);
 			Projectile->SetActorRotation(SpawnRotation);
 			Projectile->SetOwningPool(ProjectileDataManager);
-			Projectile->Activate(true);
+			Projectile->Activate(true, GunOwnerActor);
 		}
 	}
 

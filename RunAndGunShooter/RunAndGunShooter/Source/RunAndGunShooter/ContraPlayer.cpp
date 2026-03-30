@@ -49,6 +49,7 @@ void AContraPlayer::BeginPlay()
 			newGun->AttachToComponent(GetMesh(), AttachmentRule, TEXT("WeaponSocket"));
 
 			CurrentWeapon = newGun;
+			CurrentWeapon->SetGunOwnerActor(this);
 		}
 	}
 }
@@ -60,7 +61,8 @@ void AContraPlayer::Tick(float DeltaTime)
 
 	if (bIsJumping)
 	{
-		if (GetWorld()->GetTimeSeconds() - CurrentJumpTime >= MidAirTimeBeforePlatformSwitch)
+		if ((GetWorld()->GetTimeSeconds() - CurrentJumpTime >= MidAirTimeBeforePlatformSwitch)
+			|| IsCrouched())
 		{
 			SwitchPlatform();
 		}
@@ -216,6 +218,7 @@ void AContraPlayer::Respawn()
 			FAttachmentTransformRules AttachmentRule(EAttachmentRule::SnapToTarget, true);
 			newGun->AttachToComponent(GetMesh(), AttachmentRule, TEXT("WeaponSocket"));
 			CurrentWeapon = newGun;
+			CurrentWeapon->SetGunOwnerActor(this);
 		}
 	}
 }

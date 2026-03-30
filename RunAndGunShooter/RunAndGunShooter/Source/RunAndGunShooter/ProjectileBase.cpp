@@ -40,8 +40,9 @@ void AProjectileBase::Tick(float DeltaTime)
 
 }
 
-void AProjectileBase::Activate(bool activate)
+void AProjectileBase::Activate(bool activate, AActor* InInstigator)
 {
+	ProjectileInstigator = activate ? InInstigator : nullptr;
 	bIsActive = activate;
 	MovementComponent->Activate(activate);
 	SetActorEnableCollision(activate);
@@ -60,7 +61,7 @@ void AProjectileBase::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent,	A
 {
 	if(OtherActor && OtherActor->Implements<UDamageableInterface>() && OtherActor != this)
 	{
-		IDamageableInterface::Execute_ApplyDamage(OtherActor, Damage, GetOwner());
+		IDamageableInterface::Execute_ApplyDamage(OtherActor, Damage, GetProjectileInstigator());
 
 		if (ImpactVFX)
 		{

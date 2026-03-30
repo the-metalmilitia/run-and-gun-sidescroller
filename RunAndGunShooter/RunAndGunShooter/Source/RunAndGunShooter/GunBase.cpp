@@ -46,7 +46,7 @@ void AGunBase::Shoot_Implementation()
 			Projectile->SetActorLocation(ProjectileSpawnPoint->GetComponentLocation());
 			Projectile->SetActorRotation(ProjectileSpawnPoint->GetComponentRotation());
 			Projectile->SetOwningPool(ProjectileDataManager);
-			Projectile->Activate(true);
+			Projectile->Activate(true, GunOwnerActor);
 			UE_LOG(LogTemp, Warning, TEXT("Projectile of type %d shot"), SpawnedProjectileType);
 		}
 	}

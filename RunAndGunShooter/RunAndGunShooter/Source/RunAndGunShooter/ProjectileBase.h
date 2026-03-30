@@ -39,7 +39,7 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	void Activate(bool activate);
+	void Activate(bool activate, AActor* InInstigator = nullptr);
 
 	void SetActive(bool bActive) { bIsActive = bActive; }
 
@@ -59,6 +59,9 @@ public:
 
 	UFUNCTION(BlueprintPure, Category = "Projectile Pool")
 	UProjectileDataManager* GetOwningPool() const { return OwningPool; }
+
+	UFUNCTION(BlueprintPure, Category = "Projectile")
+	AActor* GetProjectileInstigator() const { return ProjectileInstigator; }
 
 	float GetProjectileSpeed() const { return ProjectileSpeed; }
 	float GetDamage() const { return Damage; }
@@ -95,6 +98,9 @@ protected:
 
 private:
 	bool bIsActive = false;
+
+	UPROPERTY()
+	TObjectPtr<AActor> ProjectileInstigator;
 
 	UPROPERTY()
 	TObjectPtr<UProjectileDataManager> OwningPool;

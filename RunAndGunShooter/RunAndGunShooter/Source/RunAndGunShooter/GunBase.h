@@ -37,6 +37,9 @@ public:
 
 	USceneComponent* GetProjectileSpawnPoint() const { return ProjectileSpawnPoint; }
 	void SnapProjectileSpawnPoint(USceneComponent* TargetComponent, FName SocketName);
+
+	UFUNCTION(BlueprintCallable, Category = "Gun")
+	void SetGunOwnerActor(AActor* NewOwner) { GunOwnerActor = NewOwner; }
 	
 protected:
 	UPROPERTY(VisibleAnywhere)
@@ -53,6 +56,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	uint8 ProjectileAmountPerShot = 1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gun")
+	TObjectPtr<AActor> GunOwnerActor;
 
 	UPROPERTY(EditDefaultsOnly, Category = "VFX")
 	UParticleSystem* MuzzleFlashVFX = nullptr;
