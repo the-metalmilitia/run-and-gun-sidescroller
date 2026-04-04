@@ -34,6 +34,11 @@ void AContraPlayer::BeginPlay()
 		}
 	}
 
+	if (PlayerController && GameMode && PlayerController->GetHUDWidget())
+	{
+		PlayerController->GetHUDWidget()->SetLives(GameMode->Lives);
+	}
+
 	GetMesh()->HideBoneByName("weapon_r", EPhysBodyOp::PBO_None);
 
 	if(Rifle != nullptr)
@@ -131,6 +136,8 @@ void AContraPlayer::Die()
 {
 	const bool bHasLivesRemaining = IsValid(GameMode) && GameMode->Lives > 0;
 
+	UnCrouch();
+	bIsJumping = false;
 	if (bHasLivesRemaining && IsValid(PlayerController))
 	{
 		RespawnLocation = GetActorLocation();
@@ -143,11 +150,19 @@ void AContraPlayer::Die()
 		}
 
 		GameMode->Lives--;
+		if (PlayerController && PlayerController->GetHUDWidget())
+		{
+			PlayerController->GetHUDWidget()->SetLives(GameMode->Lives);
+		}
 		Respawn();
 	}
 	else
 	{
 		// Final death path: full cleanup
+		if (PlayerController && PlayerController->GetHUDWidget())
+		{
+			PlayerController->GetHUDWidget()->SetLives(0);
+		}
 		GetCharacterMovement()->DisableMovement();
 
 		if (IsValid(CurrentWeapon))

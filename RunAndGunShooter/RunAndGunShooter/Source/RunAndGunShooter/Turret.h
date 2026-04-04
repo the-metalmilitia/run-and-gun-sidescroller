@@ -8,6 +8,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "DamageableInterface.h"
 #include "TurretGun.h"
+#include "ContraPlayer.h"
 class UParticleSystem;
 
 #include "Turret.generated.h"

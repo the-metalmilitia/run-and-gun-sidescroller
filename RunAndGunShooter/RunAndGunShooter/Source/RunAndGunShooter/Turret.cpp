@@ -53,6 +53,11 @@ void ATurret::ApplyDamage_Implementation(float DamageAmount, AActor* DamageCause
 		return;
 	}
 
+	if (Cast<AContraPlayer>(DamageCauser))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Turret hit by player projectile!"));
+	}
+
 	Health = FMath::Max(0.0f, Health - DamageAmount);
 
 	if (!IsAlive_Implementation())
@@ -75,6 +80,16 @@ void ATurret::Tick(float DeltaTime)
 		float DistanceToPlayer = FVector::Dist(GetActorLocation(), PlayerPawn->GetActorLocation());
 		ActivateTurret(DistanceToPlayer <= DetectionRange);
 	}
+
+	/*APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+	FVector2D ScreenPos;
+	if (PC && UGameplayStatics::ProjectWorldToScreen(PC, GetActorLocation(), ScreenPos, false))
+	{
+		if (ScreenPos.X < 0.f)
+		{
+			Die();
+		}
+	}*/
 }
 
 void ATurret::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)

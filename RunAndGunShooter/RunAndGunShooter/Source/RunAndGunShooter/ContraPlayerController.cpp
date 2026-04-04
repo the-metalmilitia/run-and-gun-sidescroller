@@ -7,3 +7,18 @@ void AContraPlayerController::CallPlayerDeath()
 {
 	
 }
+
+void AContraPlayerController::BeginPlay()
+{
+	Super::BeginPlay();
+
+	if (HUDWidgetClass)
+	{
+		HUDWidget = CreateWidget<UHUDUserWidget>(this, HUDWidgetClass);
+
+		if (HUDWidget)
+		{
+			HUDWidget->AddToViewport();
+		}
+	}
+}

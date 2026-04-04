@@ -22,6 +22,7 @@ public:
 
 protected:
 	virtual void AttackPlayer();
+	void Tick(float DeltaTime) override;
 
 private:
 	UPROPERTY(EditAnywhere)
@@ -34,6 +35,5 @@ private:
 	
 
 	void BeginPlay() override;
-	void Tick(float DeltaTime) override;
 
 };
