@@ -3,8 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Engine/DataAsset.h"
+#include "Components/ActorComponent.h"
 #include "ProjectileBase.h"
+#include "ProjectilePoolConfig.h"
 #include "ProjectileDataManager.generated.h"
 
 USTRUCT()
@@ -16,11 +17,8 @@ struct FProjectilePool
 	TArray<AProjectileBase*> Projectiles;
 };
 
-/**
- *
- */
-UCLASS(Blueprintable)
-class RUNANDGUNSHOOTER_API UProjectileDataManager : public UDataAsset
+UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
+class RUNANDGUNSHOOTER_API UProjectileDataManager : public UActorComponent
 {
 	GENERATED_BODY()
 
@@ -37,12 +35,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Projectile Pool")
 	void ClearPools();
 
+	UPROPERTY(EditAnywhere, Category = "Projectile Pool")
+	TObjectPtr<UProjectilePoolConfig> Config;
+
 private:
-	UPROPERTY(EditDefaultsOnly, Category = "Projectile Pool")
-	TArray<TSubclassOf<AProjectileBase>> TypesOfProjectile;
-
-	static constexpr int32 PoolSize = 20;
-
 	UPROPERTY()
 	TMap<int32, FProjectilePool> ProjectilePools;
 };

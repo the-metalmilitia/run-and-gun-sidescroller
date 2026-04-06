@@ -9,7 +9,7 @@
 #include "DamageableInterface.h"
 #include "TurretGun.h"
 #include "ContraPlayer.h"
-class UParticleSystem;
+class UNiagaraSystem;
 
 #include "Turret.generated.h"
 
@@ -62,7 +62,10 @@ private:
 	float Health = 5;
 
 	UPROPERTY(EditDefaultsOnly, Category = "VFX")
-	UParticleSystem* DeathVFX = nullptr;
+	UNiagaraSystem* ImpactVFX = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, Category = "VFX")
+	UNiagaraSystem* DeathVFX = nullptr;
 
 	void FireShot();
 

@@ -2,6 +2,7 @@
 
 #include "Turret.h"
 #include "Kismet/GameplayStatics.h"
+#include "NiagaraFunctionLibrary.h"
 #include "TurretAIController.h"
 #include "EnemyAIController.h"
 #include "ShooterInterface.h"
@@ -59,6 +60,12 @@ void ATurret::ApplyDamage_Implementation(float DamageAmount, AActor* DamageCause
 	}
 
 	Health = FMath::Max(0.0f, Health - DamageAmount);
+
+	if (ImpactVFX)
+	{
+		FVector SpawnLocation = DamageCauser ? DamageCauser->GetActorLocation() : GetActorLocation();
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ImpactVFX, SpawnLocation, FRotator::ZeroRotator);
+	}
 
 	if (!IsAlive_Implementation())
 	{
@@ -133,7 +140,7 @@ void ATurret::Die()
 
 	if (DeathVFX)
 	{
-		UGameplayStatics::SpawnEmitterAtLocation(this, DeathVFX,
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, DeathVFX,
 			GetActorLocation(), FRotator::ZeroRotator);
 	}
 

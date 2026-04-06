@@ -15,6 +15,8 @@ class RUNANDGUNSHOOTER_API ASniperAIController : public AEnemyAIController, publ
 	GENERATED_BODY()
 
 public:
+	ASniperAIController();
+
 	virtual void Tick(float DeltaTime) override;
 
 	virtual void SetProjectile_Implementation(ProjectileType Type, int AmountPerShot) override;
@@ -27,8 +29,8 @@ public:
 private:
 	void Die();
 
-	UPROPERTY(EditDefaultsOnly, Category = "Shooter")
-	TObjectPtr<UProjectileDataManager> ProjectileDataManager;
+	UPROPERTY(VisibleAnywhere, Category = "Shooter")
+	UProjectileDataManager* ProjectileDataManager;
 
 	ProjectileType SpawnedProjectileType = ProjectileType::Default;
 

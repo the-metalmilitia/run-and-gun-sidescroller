@@ -7,7 +7,8 @@
 #include "ProjectileBase.h"
 #include "ProjectileDataManager.h"
 #include "ShooterInterface.h"
-class UParticleSystem;
+class UNiagaraSystem;
+class UNiagaraComponent;
 
 #include "GunBase.generated.h"
 
@@ -51,8 +52,8 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	USceneComponent* ProjectileSpawnPoint;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Projectile Pool")
-	TObjectPtr<UProjectileDataManager> ProjectileDataManager;
+	UPROPERTY(VisibleAnywhere, Category = "Projectile Pool")
+	UProjectileDataManager* ProjectileDataManager;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	uint8 ProjectileAmountPerShot = 1;
@@ -61,7 +62,12 @@ protected:
 	TObjectPtr<AActor> GunOwnerActor;
 
 	UPROPERTY(EditDefaultsOnly, Category = "VFX")
-	UParticleSystem* MuzzleFlashVFX = nullptr;
+	UNiagaraSystem* MuzzleFlashVFX = nullptr;
+
+	UPROPERTY(VisibleAnywhere, Category = "VFX")
+	UNiagaraComponent* MuzzleFlashComponent = nullptr;
+
+	void SpawnMuzzleVFX();
 
 protected:
 	ProjectileType SpawnedProjectileType;

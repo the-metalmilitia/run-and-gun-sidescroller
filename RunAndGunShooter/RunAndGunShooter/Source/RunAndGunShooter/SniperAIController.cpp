@@ -4,6 +4,11 @@
 #include "Kismet/GameplayStatics.h"
 #include "ContraPlayer.h"
 
+ASniperAIController::ASniperAIController()
+{
+	ProjectileDataManager = CreateDefaultSubobject<UProjectileDataManager>("ProjectileDataManager");
+}
+
 void ASniperAIController::SetProjectile_Implementation(ProjectileType Type, int AmountPerShot)
 {
 	SpawnedProjectileType = Type;

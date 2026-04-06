@@ -1,7 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "TurretGun.h"
-#include "Kismet/GameplayStatics.h"
 
 void ATurretGun::BeginPlay()
 {
@@ -34,10 +33,7 @@ void ATurretGun::Shoot_Implementation()
 		}
 	}
 
-	if (MuzzleFlashVFX)
-	{
-		UGameplayStatics::SpawnEmitterAtLocation(this, MuzzleFlashVFX, SpawnLocation, SpawnRotation);
-	}
+	SpawnMuzzleVFX();
 }
 
 void ATurretGun::AimToward(FVector WorldTargetLocation, float DeltaSeconds, float RotationSpeed)

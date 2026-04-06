@@ -9,7 +9,8 @@
 #include "ProjectileBase.generated.h"
 
 class UProjectileDataManager;
-class UParticleSystem;
+class UNiagaraSystem;
+class UNiagaraComponent;
 
 
 UENUM(BlueprintType)
@@ -81,6 +82,9 @@ private:
 	UPROPERTY(VisibleAnywhere)
 	UProjectileMovementComponent* MovementComponent;
 
+	UPROPERTY(VisibleAnywhere, Category = "VFX")
+	UNiagaraComponent* TrailComponent;
+
 	UPROPERTY(EditDefaultsOnly)
 	float ProjectileSpeed = 2000.0f;
 
@@ -88,10 +92,8 @@ private:
 	float Damage = 10.0f;
 
 	UPROPERTY(EditDefaultsOnly, Category = "VFX")
-	UParticleSystem* TrailVFX = nullptr;
+	UNiagaraSystem* TrailVFX = nullptr;
 
-	UPROPERTY(EditDefaultsOnly, Category = "VFX")
-	UParticleSystem* ImpactVFX = nullptr;
 
 protected:
 	ProjectileType Type = ProjectileType::Default;

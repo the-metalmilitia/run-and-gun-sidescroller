@@ -5,6 +5,7 @@
 
 #include "Components/CapsuleComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "NiagaraFunctionLibrary.h"
 #include "Engine/DamageEvents.h"
 #include "EnhancedInput/Public/EnhancedInputSubsystems.h"
 #include "EnhancedInput/Public/EnhancedInputComponent.h"
@@ -121,6 +122,12 @@ void AContraPlayer::ApplyDamage_Implementation(float DamageAmount, AActor* Damag
 
 	CurrentHealth = FMath::Max(0.0f, CurrentHealth - DamageAmount);
 
+	if (ImpactVFX)
+	{
+		FVector SpawnLocation = DamageCauser ? DamageCauser->GetActorLocation() : GetActorLocation();
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ImpactVFX, SpawnLocation, FRotator::ZeroRotator);
+	}
+
 	if (!IsAlive_Implementation())
 	{
 		Die();
@@ -192,7 +199,7 @@ void AContraPlayer::Die()
 
 		if (DeathVFX)
 		{
-			UGameplayStatics::SpawnEmitterAtLocation(this, DeathVFX,
+			UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, DeathVFX,
 				GetActorLocation(), FRotator::ZeroRotator);
 		}
 

@@ -5,6 +5,7 @@
 #include "ProjectileDataManager.h"
 #include "DamageableInterface.h"
 #include "Kismet/GameplayStatics.h"
+#include "NiagaraComponent.h"
 
 
 // Sets default values
@@ -24,6 +25,10 @@ AProjectileBase::AProjectileBase()
 
 	MovementComponent = CreateDefaultSubobject<UProjectileMovementComponent>("MovementComponent");
 	MovementComponent->Activate(false);
+
+	TrailComponent = CreateDefaultSubobject<UNiagaraComponent>("TrailComponent");
+	TrailComponent->SetupAttachment(Root);
+	TrailComponent->bAutoActivate = false;
 }
 
 // Called when the game starts or when spawned
@@ -50,10 +55,17 @@ void AProjectileBase::Activate(bool activate, AActor* InInstigator)
 	SetActorTickEnabled(activate);
 	MovementComponent->Velocity = activate ? GetActorForwardVector() * ProjectileSpeed : FVector::ZeroVector;
 
-	if (activate && TrailVFX)
+	if (TrailComponent)
 	{
-		UGameplayStatics::SpawnEmitterAtLocation(this, TrailVFX,
-			GetActorLocation(), GetActorRotation());
+		if (activate && TrailVFX)
+		{
+			TrailComponent->SetAsset(TrailVFX);
+			TrailComponent->Activate(true);
+		}
+		else
+		{
+			TrailComponent->Deactivate();
+		}
 	}
 }
 
@@ -63,11 +75,6 @@ void AProjectileBase::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent,	A
 	{
 		IDamageableInterface::Execute_ApplyDamage(OtherActor, Damage, GetProjectileInstigator());
 
-		if (ImpactVFX)
-		{
-			UGameplayStatics::SpawnEmitterAtLocation(this, ImpactVFX,
-				GetActorLocation(), FRotator::ZeroRotator);
-		}
     }
 }
 

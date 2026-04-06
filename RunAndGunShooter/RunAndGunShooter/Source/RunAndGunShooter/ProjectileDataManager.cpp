@@ -1,15 +1,15 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "ProjectileDataManager.h"
 
 void UProjectileDataManager::CreateProjectilePool(UObject* WorldContextObject, ProjectileType Type)
 {
 	UWorld* World = WorldContextObject ? WorldContextObject->GetWorld() : nullptr;
 
-	if (TypesOfProjectile.Num() == 0
+	if (!Config
+		|| Config->TypesOfProjectile.Num() == 0
 		|| Type == ProjectileType::Invalid
-		|| static_cast<int32>(Type) >= TypesOfProjectile.Num()
+		|| static_cast<int32>(Type) >= Config->TypesOfProjectile.Num()
 		|| World == nullptr)
 	{
 		return;
@@ -24,13 +24,13 @@ void UProjectileDataManager::CreateProjectilePool(UObject* WorldContextObject, P
 			if (IsValid(Projectile)) Projectile->Destroy();
 		}
 		Pool.Empty();
-		Pool.Reserve(PoolSize);
+		Pool.Reserve(UProjectilePoolConfig::PoolSize);
 	}
 
-	for (int32 i = 0; i < PoolSize; i++)
+	for (int32 i = 0; i < UProjectilePoolConfig::PoolSize; i++)
 	{
 		AProjectileBase* Projectile = World->SpawnActor<AProjectileBase>(
-			TypesOfProjectile[static_cast<int32>(Type)], FVector::ZeroVector, FRotator::ZeroRotator);
+			Config->TypesOfProjectile[static_cast<int32>(Type)], FVector::ZeroVector, FRotator::ZeroRotator);
 
 		if (Projectile)
 		{
@@ -80,12 +80,18 @@ void UProjectileDataManager::GetProjectileFromPool(ProjectileType Type, TArray<A
 
 void UProjectileDataManager::ReturnProjectileToPool(AProjectileBase* Projectile)
 {
-	if (!IsValid(Projectile)) return;
+	if (!IsValid(Projectile))
+		return;
+
+	Projectile->Activate(false);
 
 	FProjectilePool* PoolEntry = ProjectilePools.Find(static_cast<int32>(Projectile->GetProjectileType()));
 
-	if (!PoolEntry || PoolEntry->Projectiles.Num() >= PoolSize) return;
+	if (!PoolEntry)
+		return;
 
-	Projectile->Activate(false);
+	if (!Config || PoolEntry->Projectiles.Num() >= UProjectilePoolConfig::PoolSize)
+		return;
+
 	PoolEntry->Projectiles.Add(Projectile);
 }

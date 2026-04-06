@@ -9,7 +9,7 @@
 #include "InputMappingContext.h"
 #include "InputAction.h"
 #include "GameFramework/Character.h"
-class UParticleSystem;
+class UNiagaraSystem;
 
 #include "ContraPlayer.generated.h"
 
@@ -78,7 +78,10 @@ protected:
 	UAnimMontage* ShootMontage;
 
 	UPROPERTY(EditDefaultsOnly, Category = "VFX")
-	UParticleSystem* DeathVFX = nullptr;
+	UNiagaraSystem* ImpactVFX = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, Category = "VFX")
+	UNiagaraSystem* DeathVFX = nullptr;
 
 	UPROPERTY(EditAnywhere, Category = "Lives")
 	float RespawnDropHeight = 500.0f;

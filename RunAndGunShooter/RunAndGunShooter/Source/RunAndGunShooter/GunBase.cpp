@@ -2,7 +2,7 @@
 
 
 #include "GunBase.h"
-#include "Kismet/GameplayStatics.h"
+#include "NiagaraComponent.h"
 
 // Sets default values
 AGunBase::AGunBase()
@@ -17,6 +17,12 @@ AGunBase::AGunBase()
 
 	ProjectileSpawnPoint = CreateDefaultSubobject<USceneComponent>("ProjectileLaunchPoint");
 	ProjectileSpawnPoint->SetupAttachment(Root);
+
+	ProjectileDataManager = CreateDefaultSubobject<UProjectileDataManager>("ProjectileDataManager");
+
+	MuzzleFlashComponent = CreateDefaultSubobject<UNiagaraComponent>("MuzzleFlashComponent");
+	MuzzleFlashComponent->SetupAttachment(ProjectileSpawnPoint);
+	MuzzleFlashComponent->bAutoActivate = false;
 }
 
 // Called when the game starts or when spawned
@@ -24,6 +30,11 @@ void AGunBase::BeginPlay()
 {
 	Super::BeginPlay();
 	SetProjectile_Implementation(ProjectileType::Default, 1);
+
+	if (MuzzleFlashComponent && MuzzleFlashVFX)
+	{
+		MuzzleFlashComponent->SetAsset(MuzzleFlashVFX);
+	}
 }
 
 void AGunBase::SetProjectile_Implementation(ProjectileType Type, int AmountPerShot)
@@ -51,11 +62,14 @@ void AGunBase::Shoot_Implementation()
 		}
 	}
 
-	if (MuzzleFlashVFX)
+	SpawnMuzzleVFX();
+}
+
+void AGunBase::SpawnMuzzleVFX()
+{
+	if (MuzzleFlashComponent)
 	{
-		UGameplayStatics::SpawnEmitterAtLocation(this, MuzzleFlashVFX,
-			ProjectileSpawnPoint->GetComponentLocation(),
-			ProjectileSpawnPoint->GetComponentRotation());
+		MuzzleFlashComponent->Activate(true);
 	}
 }
 
