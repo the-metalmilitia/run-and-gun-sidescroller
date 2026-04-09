@@ -15,7 +15,6 @@ AContraPlayer::AContraPlayer()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	
 }
 
 // Called when the game starts or when spawned
@@ -71,10 +70,23 @@ void AContraPlayer::Tick(float DeltaTime)
 			|| IsCrouched())
 		{
 			SwitchPlatform();
+			UE_LOG(LogTemp, Warning, TEXT("IsJumping"));
 		}
-	}
 
-	
+	}
+	FString MoveMode = UEnum::GetValueAsString(GetCharacterMovement()->MovementMode);
+	GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Yellow, MoveMode);
+
+	// Temp debug in Tick
+	FFindFloorResult FloorResult;
+	GetCharacterMovement()->FindFloor(GetActorLocation(), FloorResult, false);
+
+	GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Cyan,
+		FString::Printf(TEXT("Walkable: %d | FloorDist: %.3f | PenetrationDepth: %.3f | bBlockingHit: %d"),
+			FloorResult.bWalkableFloor,
+			FloorResult.FloorDist,
+			FloorResult.HitResult.PenetrationDepth,
+			FloorResult.HitResult.bBlockingHit));
 }
 
 // Called to bind functionality to input
@@ -142,6 +154,10 @@ bool AContraPlayer::IsAlive_Implementation() const
 void AContraPlayer::Die()
 {
 	const bool bHasLivesRemaining = IsValid(GameMode) && GameMode->Lives > 0;
+
+	GetCharacterMovement()->StopMovementImmediately();
+	GetCharacterMovement()->DisableMovement();
+	GetCharacterMovement()->SetComponentTickEnabled(false);
 
 	UnCrouch();
 	bIsJumping = false;
@@ -211,6 +227,12 @@ void AContraPlayer::Respawn()
 {
 	SetActorLocation(RespawnLocation + FVector(0.0f, 0.0f, RespawnDropHeight));
 	CurrentHealth = MaxHealth;
+
+	GetCharacterMovement()->SetComponentTickEnabled(true);
+	GetCharacterMovement()->DefaultLandMovementMode = MOVE_Walking;
+	GetCharacterMovement()->DisableMovement(); // Temporarily to reset
+	GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+	EnableInput(PlayerController);
 
 	bIsInvincible = true;
 	GetWorldTimerManager().SetTimer(InvincibilityTimerHandle,

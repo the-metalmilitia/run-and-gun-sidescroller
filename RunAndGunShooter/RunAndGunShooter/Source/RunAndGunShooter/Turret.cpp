@@ -143,6 +143,4 @@ void ATurret::Die()
 		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, DeathVFX,
 			GetActorLocation(), FRotator::ZeroRotator);
 	}
-
-	Destroy();
 }
