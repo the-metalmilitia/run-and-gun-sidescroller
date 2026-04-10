@@ -3,6 +3,7 @@
 #include "SniperAIController.h"
 #include "Kismet/GameplayStatics.h"
 #include "ContraPlayer.h"
+#include "Components/SkeletalMeshComponent.h"
 
 ASniperAIController::ASniperAIController()
 {

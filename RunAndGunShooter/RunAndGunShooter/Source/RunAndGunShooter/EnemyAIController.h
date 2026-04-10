@@ -26,7 +26,7 @@ protected:
 
 private:
 	UPROPERTY(EditAnywhere)
-	float AcceptanceRadius = 200.0f;
+	float ThresholdAlertDistance = 200.0f;
 
 	UPROPERTY(EditAnywhere)
 	UBehaviorTree* BehaviorTree = nullptr;

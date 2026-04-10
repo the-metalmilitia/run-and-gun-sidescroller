@@ -29,9 +29,12 @@ void AEnemyAIController::BeginPlay()
 void AEnemyAIController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	if(PlayerPawn && LineOfSightTo(PlayerPawn))
+	if(PlayerPawn && PlayerPawn->GetDistanceTo(GetPawn()))
 	{
-		SetFocus(PlayerPawn);
+		if (LineOfSightTo(PlayerPawn))
+		{
+			SetFocus(PlayerPawn);
+		}
 	}
 	else
 	{

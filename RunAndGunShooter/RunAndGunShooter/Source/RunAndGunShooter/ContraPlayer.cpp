@@ -159,6 +159,7 @@ void AContraPlayer::Die()
 	GetCharacterMovement()->DisableMovement();
 	GetCharacterMovement()->SetComponentTickEnabled(false);
 
+	Super::UnCrouch();
 	UnCrouch();
 	bIsJumping = false;
 	if (bHasLivesRemaining && IsValid(PlayerController))
@@ -295,6 +296,7 @@ void AContraPlayer::VerticalMoveEvent(const FInputActionValue& Value)
 		&& (AllowedSwitch == VerticalSwitchOption::Bothways
 			|| AllowedSwitch == VerticalSwitchOption::Up))
 	{
+		Super::UnCrouch();
 		UnCrouch();
 		VerticalSwitch = VerticalSwitchOption::Up;
 	}
@@ -303,10 +305,12 @@ void AContraPlayer::VerticalMoveEvent(const FInputActionValue& Value)
 			|| AllowedSwitch == VerticalSwitchOption::Down))
 	{
 		VerticalSwitch = VerticalSwitchOption::Down;
+		Super::Crouch();
 		Crouch();
 	}
 	else
 	{
+		Super::UnCrouch();
 		UnCrouch();
 		VerticalSwitch = VerticalSwitchOption::None;
 		UE_LOG(LogTemp, Warning, TEXT("%f"),movement);
