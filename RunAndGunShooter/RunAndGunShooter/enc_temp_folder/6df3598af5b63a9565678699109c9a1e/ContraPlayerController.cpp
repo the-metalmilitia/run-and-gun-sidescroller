@@ -7,21 +7,9 @@
 
 void AContraPlayerController::ApplyDamage_Implementation(float DamageAmount, AActor* DamageCauser)
 {
-	AContraPlayer* ContraPlayer = Cast<AContraPlayer>(GetPawn());
-	if (!ContraPlayer) return;
-
-	if (ImpactVFX)
+	if (AContraPlayer* ContraPlayer = Cast<AContraPlayer>(GetPawn()))
 	{
-		FVector PlayerSpawnLocation = DamageCauser ? DamageCauser->GetActorLocation() : ContraPlayer->GetActorLocation();
-		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), ImpactVFX, PlayerSpawnLocation, FRotator::ZeroRotator);
-	}
-
-	FVector DeathLocation = ContraPlayer->GetActorLocation();
-	ContraPlayer->ApplyDamage(DamageAmount, DamageCauser);
-
-	if (!ContraPlayer->IsAlive() && DeathVFX)
-	{
-		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), DeathVFX, DeathLocation, FRotator::ZeroRotator);
+		ContraPlayer->ApplyDamage(DamageAmount, DamageCauser);
 	}
 }
 

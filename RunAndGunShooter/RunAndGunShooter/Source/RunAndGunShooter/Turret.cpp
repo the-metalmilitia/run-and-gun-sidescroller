@@ -6,6 +6,7 @@
 #include "TurretAIController.h"
 #include "EnemyAIController.h"
 #include "ShooterInterface.h"
+#include "ContraGameMode.h"
 
 ATurret::ATurret()
 {
@@ -130,6 +131,11 @@ void ATurret::FireShot()
 
 void ATurret::Die()
 {
+	if (AContraGameMode* GameMode = Cast<AContraGameMode>(GetWorld()->GetAuthGameMode()))
+	{
+		GameMode->AddScore(ScoreValue);
+	}
+
 	GetWorldTimerManager().ClearTimer(FireTimerHandle);
 
 	if (CurrentWeapon)

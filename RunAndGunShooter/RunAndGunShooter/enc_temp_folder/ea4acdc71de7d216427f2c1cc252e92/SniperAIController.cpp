@@ -5,9 +5,9 @@
 
 void ASniperAIController::ApplyDamage_Implementation(float DamageAmount, AActor* DamageCauser)
 {
-	if (ACharacter* CharacterPawn = Cast<ACharacter>(GetPawn()))
+	if (ACharacter* Pawn = Cast<ACharacter>(GetPawn()))
 	{
-		if (CharacterPawn->bIsCrouched) return;
+		if (Pawn->bIsCrouched) return;
 	}
 	Super::ApplyDamage_Implementation(DamageAmount, DamageCauser);
 }

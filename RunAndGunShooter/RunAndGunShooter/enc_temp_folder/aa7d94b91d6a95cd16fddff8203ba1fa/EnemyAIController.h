@@ -38,15 +38,12 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "VFX")
 	UNiagaraSystem* DeathVFX = nullptr;
 
-	UPROPERTY(EditAnywhere, Category = "Enemy")
+private:
+	UPROPERTY(EditAnywhere)
 	float ThresholdAlertDistance = 200.0f;
 
-	APawn* PlayerPawn = nullptr;
-	APawn* ControlledPawn = nullptr;
-	APlayerController* ContraPlayerController = nullptr;
-
-private:
 	UPROPERTY(EditAnywhere)
 	UBehaviorTree* BehaviorTree = nullptr;
 
+	APawn* PlayerPawn = nullptr;
 };

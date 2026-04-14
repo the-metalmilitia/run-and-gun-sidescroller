@@ -78,6 +78,16 @@ UProjectileDataManager* AGunBase::GetProjectileDataManager_Implementation() cons
 	return ProjectileDataManager;
 }
 
+void AGunBase::DestroyWeapon(bool clearPool)
+{
+	if (clearPool && IsValid(ProjectileDataManager))
+	{
+		ProjectileDataManager->ClearPools();
+	}
+
+	Destroy();
+}
+
 void AGunBase::SnapProjectileSpawnPoint(USceneComponent* TargetComponent, FName SocketName)
 {
 	if (ProjectileSpawnPoint && TargetComponent)

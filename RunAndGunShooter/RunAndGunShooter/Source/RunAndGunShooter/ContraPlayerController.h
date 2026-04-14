@@ -4,28 +4,44 @@
 
 #include "CoreMinimal.h"
 #include "ContraGameMode.h"
+#include "DamageableInterface.h"
 #include "HUDUserWidget.h"
 #include "GameFramework/PlayerController.h"
 #include "ContraPlayerController.generated.h"
 
-/**
- *
- */
+class UNiagaraSystem;
+
 UCLASS()
-class RUNANDGUNSHOOTER_API AContraPlayerController : public APlayerController
+class RUNANDGUNSHOOTER_API AContraPlayerController : public APlayerController, public IDamageableInterface
 {
 	GENERATED_BODY()
+
 public:
-	void CallPlayerDeath();
+	void PlayerDeath();
+    void PlayerRespawn();
 
 	void BeginPlay() override;
 
-	UHUDUserWidget* GetHUDWidget() const { return HUDWidget; }
+	virtual void ApplyDamage_Implementation(float DamageAmount, AActor* DamageCauser) override;
+	virtual bool IsAlive_Implementation() const override;
 
-public:
+	UPROPERTY(EditDefaultsOnly, Category = "VFX")
+	UNiagaraSystem* ImpactVFX = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, Category = "VFX")
+	UNiagaraSystem* DeathVFX = nullptr;
+
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UHUDUserWidget> HUDWidgetClass;
 
 private:
+	UFUNCTION()
+	void HandleScoreChanged(int32 NewScore);
+
+	UFUNCTION()
+	void HandleLivesChanged(int32 NewLives);
+
 	UHUDUserWidget* HUDWidget;
+
+    AContraGameMode* GameMode;
 };

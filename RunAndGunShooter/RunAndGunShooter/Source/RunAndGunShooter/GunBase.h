@@ -36,11 +36,14 @@ public:
 	virtual void Shoot_Implementation() override;
 	virtual UProjectileDataManager* GetProjectileDataManager_Implementation() const override;
 
+	void DestroyWeapon(bool clearPool);
+
 	USceneComponent* GetProjectileSpawnPoint() const { return ProjectileSpawnPoint; }
 	void SnapProjectileSpawnPoint(USceneComponent* TargetComponent, FName SocketName);
 
 	UFUNCTION(BlueprintCallable, Category = "Gun")
 	void SetGunOwnerActor(AActor* NewOwner) { GunOwnerActor = NewOwner; }
+
 	
 protected:
 	UPROPERTY(VisibleAnywhere)

@@ -9,8 +9,6 @@ void AEnemyAIController::BeginPlay()
 {
 	Super::BeginPlay();
 	PlayerPawn = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
-	ContraPlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
-	ControlledPawn = GetPawn();
 
 	if (!PlayerPawn)
 	{
@@ -32,6 +30,7 @@ void AEnemyAIController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	APawn* ControlledPawn = GetPawn();
 	if (!ControlledPawn) return;
 
 	if (PlayerPawn)
@@ -46,9 +45,9 @@ void AEnemyAIController::Tick(float DeltaTime)
 		}
 	}
 
-	
+	APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
 	FVector2D ScreenPos;
-	if (ContraPlayerController && UGameplayStatics::ProjectWorldToScreen(ContraPlayerController, ControlledPawn->GetActorLocation(), ScreenPos, false))
+	if (PC && UGameplayStatics::ProjectWorldToScreen(PC, ControlledPawn->GetActorLocation(), ScreenPos, false))
 	{
 		if (ScreenPos.X < 0.f)
 		{
@@ -62,11 +61,6 @@ void AEnemyAIController::ApplyDamage_Implementation(float DamageAmount, AActor* 
 	if (!IsAlive_Implementation() || DamageCauser == GetPawn()) return;
 
 	Health = FMath::Max(0.f, Health - DamageAmount);
-
-	if (ImpactVFX && GetPawn())
-	{
-		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), ImpactVFX, GetPawn()->GetActorLocation(), FRotator::ZeroRotator);
-	}
 
 	if (!IsAlive_Implementation())
 	{
@@ -86,19 +80,8 @@ void AEnemyAIController::Die()
 		GameMode->AddScore(ScoreValue);
 	}
 
-	if (ControlledPawn)
+	if (APawn* ControlledPawn = GetPawn())
 	{
-		TArray<AActor*> AttachedActors;
-		ControlledPawn->GetAttachedActors(AttachedActors);
-		for (AActor* Actor : AttachedActors)
-		{
-			if (Actor) Actor->Destroy();
-		}
-
-		if (DeathVFX)
-		{
-			UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), DeathVFX, ControlledPawn->GetActorLocation(), FRotator::ZeroRotator);
-		}
 		ControlledPawn->Destroy();
 	}
 }

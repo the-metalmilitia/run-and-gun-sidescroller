@@ -6,6 +6,8 @@
 #include "DamageableInterface.h"
 #include "Kismet/GameplayStatics.h"
 #include "NiagaraComponent.h"
+#include "GameFramework/Pawn.h"
+#include "GameFramework/Controller.h"
 
 
 // Sets default values
@@ -69,12 +71,27 @@ void AProjectileBase::Activate(bool activate, AActor* InInstigator)
 	}
 }
 
-void AProjectileBase::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent,	AActor* OtherActor, UPrimitiveComponent* OtherComp,	int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void AProjectileBase::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if(OtherActor && OtherActor->Implements<UDamageableInterface>() && OtherActor != this)
-	{
-		IDamageableInterface::Execute_ApplyDamage(OtherActor, Damage, GetProjectileInstigator());
+ 	if (!OtherActor || OtherActor == this) return;
 
-    }
+	if (APawn* Pawn = Cast<APawn>(OtherActor))
+	{
+		// Controller owns damage for all pawns (player, Runner, Sniper)
+		if (AController* Controller = Pawn->GetController())
+		{
+			if (Controller->Implements<UDamageableInterface>())
+			{
+				IDamageableInterface::Execute_ApplyDamage(Controller, Damage, GetProjectileInstigator());
+				return;
+			}
+		}
+
+		// Fallback: pawn manages its own damage (ATurret)
+		if (OtherActor->Implements<UDamageableInterface>())
+		{
+			IDamageableInterface::Execute_ApplyDamage(OtherActor, Damage, GetProjectileInstigator());
+		}
+	}
 }
 

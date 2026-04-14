@@ -61,6 +61,9 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Turret Properties")
 	float Health = 5;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Enemy")
+	int32 ScoreValue = 10;
+
 	UPROPERTY(EditDefaultsOnly, Category = "VFX")
 	UNiagaraSystem* ImpactVFX = nullptr;
 

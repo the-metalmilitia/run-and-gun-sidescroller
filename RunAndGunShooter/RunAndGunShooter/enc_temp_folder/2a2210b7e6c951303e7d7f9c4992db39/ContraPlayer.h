@@ -8,6 +8,7 @@
 #include "InputMappingContext.h"
 #include "InputAction.h"
 #include "GameFramework/Character.h"
+class UNiagaraSystem;
 
 #include "ContraPlayer.generated.h"
 
