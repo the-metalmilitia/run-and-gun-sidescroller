@@ -29,7 +29,7 @@ AGunBase::AGunBase()
 void AGunBase::BeginPlay()
 {
 	Super::BeginPlay();
-	SetProjectile_Implementation(ProjectileType::Default, 1);
+	SetProjectile_Implementation(ProjectileAmountPerShot);
 
 	if (MuzzleFlashComponent && MuzzleFlashVFX)
 	{
@@ -37,13 +37,12 @@ void AGunBase::BeginPlay()
 	}
 }
 
-void AGunBase::SetProjectile_Implementation(ProjectileType Type, int AmountPerShot)
+void AGunBase::SetProjectile_Implementation(int AmountPerShot)
 {
 	ProjectileAmountPerShot = AmountPerShot;
-	SpawnedProjectileType = Type;
-	if(IsValid(ProjectileDataManager))
+	if (IsValid(ProjectileDataManager))
 	{
-		ProjectileDataManager->CreateProjectilePool(this, Type);
+		ProjectileDataManager->CreateProjectilePool(this, SpawnedProjectileType);
 	}
 }
 

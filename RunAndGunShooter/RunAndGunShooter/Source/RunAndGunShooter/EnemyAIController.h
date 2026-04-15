@@ -25,6 +25,7 @@ protected:
 	virtual void BeginPlay() override;
 	void Tick(float DeltaTime) override;
 	virtual void Die();
+	void DestroyPawn();
 
 	UPROPERTY(EditDefaultsOnly, Category = "Enemy")
 	float Health = 3.f;

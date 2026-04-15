@@ -50,9 +50,9 @@ void AEnemyAIController::Tick(float DeltaTime)
 	FVector2D ScreenPos;
 	if (ContraPlayerController && UGameplayStatics::ProjectWorldToScreen(ContraPlayerController, ControlledPawn->GetActorLocation(), ScreenPos, false))
 	{
-		if (ScreenPos.X < 0.f)
+		if (ScreenPos.X < -1000.f)
 		{
-			ControlledPawn->Destroy(); // culled off-screen, no score
+			DestroyPawn(); // culled off-screen, no score
 		}
 	}
 }
@@ -86,21 +86,26 @@ void AEnemyAIController::Die()
 		GameMode->AddScore(ScoreValue);
 	}
 
-	if (ControlledPawn)
+	if (ControlledPawn && DeathVFX)
 	{
-		TArray<AActor*> AttachedActors;
-		ControlledPawn->GetAttachedActors(AttachedActors);
-		for (AActor* Actor : AttachedActors)
-		{
-			if (Actor) Actor->Destroy();
-		}
-
-		if (DeathVFX)
-		{
-			UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), DeathVFX, ControlledPawn->GetActorLocation(), FRotator::ZeroRotator);
-		}
-		ControlledPawn->Destroy();
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), DeathVFX, ControlledPawn->GetActorLocation(), FRotator::ZeroRotator);
 	}
+
+	DestroyPawn();
+}
+
+void AEnemyAIController::DestroyPawn()
+{
+	if (!ControlledPawn) return;
+
+	TArray<AActor*> AttachedActors;
+	ControlledPawn->GetAttachedActors(AttachedActors);
+	for (AActor* Actor : AttachedActors)
+	{
+		if (Actor) Actor->Destroy();
+	}
+
+	ControlledPawn->Destroy();
 }
 
 void AEnemyAIController::SetBehaviorTree(UBehaviorTree* NewBehaviorTree)

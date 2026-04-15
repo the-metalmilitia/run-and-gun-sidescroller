@@ -2,7 +2,7 @@
 
 
 #include "ContraPlayer.h"
-
+#include "ContraPlayerController.h"
 #include "Components/CapsuleComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "EnhancedInput/Public/EnhancedInputSubsystems.h"
@@ -23,7 +23,6 @@ void AContraPlayer::BeginPlay()
 	CurrentHealth = MaxHealth;
 	
 	PlayerController = Cast<AContraPlayerController>(Controller);
-	GameMode = Cast<AContraGameMode>(GetWorld()->GetAuthGameMode());
 	if (PlayerController)
 	{
 		if (UEnhancedInputLocalPlayerSubsystem* SubSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
@@ -67,23 +66,9 @@ void AContraPlayer::Tick(float DeltaTime)
 			|| IsCrouched())
 		{
 			SwitchPlatform();
-			UE_LOG(LogTemp, Warning, TEXT("IsJumping"));
 		}
 
 	}
-	FString MoveMode = UEnum::GetValueAsString(GetCharacterMovement()->MovementMode);
-	GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Yellow, MoveMode);
-
-	// Temp debug in Tick
-	FFindFloorResult FloorResult;
-	GetCharacterMovement()->FindFloor(GetActorLocation(), FloorResult, false);
-
-	GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Cyan,
-		FString::Printf(TEXT("Walkable: %d | FloorDist: %.3f | PenetrationDepth: %.3f | bBlockingHit: %d"),
-			FloorResult.bWalkableFloor,
-			FloorResult.FloorDist,
-			FloorResult.HitResult.PenetrationDepth,
-			FloorResult.HitResult.bBlockingHit));
 }
 
 // Called to bind functionality to input
@@ -97,13 +82,14 @@ void AContraPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &AContraPlayer::JumpEvent);
 		EnhancedInputComponent->BindAction(ShootAction, ETriggerEvent::Triggered, this, &AContraPlayer::ShootEvent);
 		EnhancedInputComponent->BindAction(VerticalMoveAction, ETriggerEvent::Triggered, this, &AContraPlayer::VerticalMoveEvent);
+		EnhancedInputComponent->BindAction(VerticalMoveAction, ETriggerEvent::Completed, this, &AContraPlayer::VerticalMoveEvent);
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AContraPlayer::LookEvent);
 	}
 }
 
 void AContraPlayer::AllowPlatformSwitch(const VerticalSwitchOption allowedSwitch)
 {
-	AllowedSwitch = allowedSwitch;
+ 	AllowedSwitch = allowedSwitch;
 }
 
 void AContraPlayer::ApplyDamage(float DamageAmount, AActor* DamageCauser)
@@ -128,7 +114,7 @@ bool AContraPlayer::IsAlive() const
 
 void AContraPlayer::Die()
 {
-	const bool bHasLivesRemaining = IsValid(GameMode) && GameMode->Lives > 0;
+	const bool bHasLivesRemaining = IsValid(PlayerController) && PlayerController->GetPlayerLives() > 0;
 
 	GetCharacterMovement()->StopMovementImmediately();
 	GetCharacterMovement()->DisableMovement();
@@ -181,9 +167,13 @@ void AContraPlayer::Die()
 
 void AContraPlayer::Respawn()
 {
-	SetActorLocation(RespawnLocation + FVector(0.0f, 0.0f, RespawnDropHeight));
-	CurrentHealth = MaxHealth;
+	VerticalSwitch = VerticalSwitchOption::None;
+	AllowedSwitch = VerticalSwitchOption::None;
 
+	RespawnLocation.Y = RespawnDepth;
+	RespawnLocation.Z = RespawnDropHeight;
+	SetActorLocation(RespawnLocation);
+	CurrentHealth = MaxHealth;
 	GetCharacterMovement()->SetComponentTickEnabled(true);
 	GetCharacterMovement()->DefaultLandMovementMode = MOVE_Walking;
 	GetCharacterMovement()->DisableMovement(); // Temporarily to reset
@@ -246,7 +236,7 @@ void AContraPlayer::MoveEvent(const FInputActionValue& Value)
 
 void AContraPlayer::VerticalMoveEvent(const FInputActionValue& Value)
 {
-	float movement = Value.Get<float>();
+ 	float movement = Value.Get<float>();
 	if (movement > 0
 		&& (AllowedSwitch == VerticalSwitchOption::Bothways
 			|| AllowedSwitch == VerticalSwitchOption::Up))
@@ -268,7 +258,6 @@ void AContraPlayer::VerticalMoveEvent(const FInputActionValue& Value)
 		Super::UnCrouch();
 		UnCrouch();
 		VerticalSwitch = VerticalSwitchOption::None;
-		UE_LOG(LogTemp, Warning, TEXT("%f"),movement);
 	}
 }
 
@@ -308,7 +297,7 @@ void AContraPlayer::LookEvent(const FInputActionValue& value)
 
 void AContraPlayer::SwitchPlatform()
 {
-	bIsJumping = false;
+   	bIsJumping = false;
 	CurrentJumpTime = 0.0f;
 	CurrentLocation = GetActorLocation();
 	if (VerticalSwitch == VerticalSwitchOption::Down)
@@ -321,5 +310,7 @@ void AContraPlayer::SwitchPlatform()
 		CurrentLocation.Y -= PlatformSwitchDepth;
 		SetActorLocation(CurrentLocation);
 	}
+
+	VerticalSwitch = VerticalSwitchOption::None;
 }
 

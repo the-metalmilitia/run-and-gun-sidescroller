@@ -35,5 +35,5 @@ void ARunnerEnemyAIController::StartMovement()
 	FVector PawnLocation = ControlledPawn ? ControlledPawn->GetActorLocation() : FVector::ZeroVector;
 	FVector TargetLocation(WorldLocation.X + 1000.0f, PawnLocation.Y, PawnLocation.Z);
 
-	MoveToLocation(TargetLocation);
+	MoveToLocation(TargetLocation, -1.0f, false);
 }

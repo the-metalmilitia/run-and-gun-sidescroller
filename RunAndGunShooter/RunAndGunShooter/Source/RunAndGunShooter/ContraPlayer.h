@@ -3,13 +3,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "ContraPlayerController.h"
 #include "GunBase.h"
 #include "InputMappingContext.h"
 #include "InputAction.h"
 #include "GameFramework/Character.h"
-
 #include "ContraPlayer.generated.h"
+
+class AContraPlayerController;
 
 UENUM(BlueprintType)
 enum VerticalSwitchOption
@@ -81,8 +81,11 @@ protected:
 	UPROPERTY(EditDefaultsOnly)
 	UAnimMontage* ShootMontage;
 
-	UPROPERTY(EditAnywhere, Category = "Lives")
+	UPROPERTY(VisibleAnywhere, Category = "Lives")
 	float RespawnDropHeight = 500.0f;
+
+	UPROPERTY(VisibleAnywhere, Category = "Lives")
+	float RespawnDepth = 0.0f;
 
 	UPROPERTY(EditAnywhere, Category = "Lives")
 	float RespawnInvincibilityDuration = 3.0f;
@@ -99,6 +102,11 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void AllowPlatformSwitch(const VerticalSwitchOption allowedSwitch);
+
+	UFUNCTION(BlueprintCallable)
+	void SetRespawnDepth(float NewDepth) { RespawnDepth = NewDepth; }
+	UFUNCTION(BlueprintCallable)
+	void SetRespawnHeight(float NewHeight) { RespawnDropHeight = NewHeight; }
 
 	UFUNCTION(BlueprintCallable)
 	AGunBase* GetCurrentWeapon() const { return CurrentWeapon; }
@@ -133,10 +141,9 @@ private:
 	bool bIsInvincible = false;
 
 	VerticalSwitchOption VerticalSwitch = VerticalSwitchOption::None;
-	VerticalSwitchOption AllowedSwitch = VerticalSwitchOption::Bothways;
+	VerticalSwitchOption AllowedSwitch = VerticalSwitchOption::None;
 
 	AContraPlayerController* PlayerController = nullptr;
-	AContraGameMode* GameMode = nullptr;
 
 	UPROPERTY(VisibleAnywhere)
 	AGunBase* CurrentWeapon = nullptr;

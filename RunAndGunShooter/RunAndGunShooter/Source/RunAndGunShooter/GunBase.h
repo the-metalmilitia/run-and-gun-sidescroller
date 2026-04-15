@@ -28,7 +28,7 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
-	virtual void SetProjectile_Implementation(ProjectileType Type, int AmountPerShot) override;
+	virtual void SetProjectile_Implementation(int AmountPerShot) override;
 
 	UFUNCTION(BlueprintCallable)
 	ProjectileType GetProjectileType() const { return SpawnedProjectileType; }
@@ -73,7 +73,9 @@ protected:
 	void SpawnMuzzleVFX();
 
 protected:
-	ProjectileType SpawnedProjectileType;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile")
+	TEnumAsByte<ProjectileType> SpawnedProjectileType = ProjectileType::Default;
+
 	TArray<AProjectileBase*> ProjectilesPerShot;
 
 };

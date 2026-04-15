@@ -5,10 +5,12 @@
 #include "CoreMinimal.h"
 #include "ContraGameMode.h"
 #include "DamageableInterface.h"
+
 #include "HUDUserWidget.h"
 #include "GameFramework/PlayerController.h"
 #include "ContraPlayerController.generated.h"
 
+class AContraPlayer;
 class UNiagaraSystem;
 
 UCLASS()
@@ -19,6 +21,7 @@ class RUNANDGUNSHOOTER_API AContraPlayerController : public APlayerController, p
 public:
 	void PlayerDeath();
     void PlayerRespawn();
+    int GetPlayerLives() const { return GameMode ? GameMode->Lives : 0; }
 
 	void BeginPlay() override;
 
@@ -43,5 +46,6 @@ private:
 
 	UHUDUserWidget* HUDWidget;
 
-    AContraGameMode* GameMode;
+    AContraGameMode* GameMode = nullptr;
+	AContraPlayer* ContraPlayer = nullptr;
 };

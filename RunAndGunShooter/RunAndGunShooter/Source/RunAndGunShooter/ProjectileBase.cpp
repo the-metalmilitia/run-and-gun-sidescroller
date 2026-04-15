@@ -73,7 +73,7 @@ void AProjectileBase::Activate(bool activate, AActor* InInstigator)
 
 void AProjectileBase::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
- 	if (!OtherActor || OtherActor == this) return;
+	if (!OtherActor || OtherActor == this || OtherActor == ProjectileInstigator) return;
 
 	if (APawn* Pawn = Cast<APawn>(OtherActor))
 	{

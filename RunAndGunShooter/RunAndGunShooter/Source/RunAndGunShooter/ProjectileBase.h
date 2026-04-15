@@ -14,14 +14,15 @@ class UNiagaraComponent;
 
 
 UENUM(BlueprintType)
-enum ProjectileType
+enum ProjectileType : uint8
 {
-	Invalid = -1,
 	Default = 0,
-	Spread = 1,
-	MachineGun = 2,
-	Spinning = 3,
-    Homing = 4
+	Missile = 1,
+	Spread = 2,
+	MachineGun = 3,
+	Spinning = 4,
+	Homing = 5,
+	Invalid = 255
 };
 UCLASS()
 class RUNANDGUNSHOOTER_API AProjectileBase : public AActor

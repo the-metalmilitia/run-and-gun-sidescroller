@@ -21,7 +21,7 @@ class RUNANDGUNSHOOTER_API IShooterInterface
 
 public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Shooter")
-	void SetProjectile(ProjectileType Type, int AmountPerShot);
+	void SetProjectile(int AmountPerShot);
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Shooter")
 	void Shoot();

@@ -36,7 +36,6 @@ void UProjectileDataManager::CreateProjectilePool(UObject* WorldContextObject, P
 		{
 			Projectile->Activate(false);
 			Pool.Add(Projectile);
-			UE_LOG(LogTemp, Warning, TEXT("Projectile created of type %d"), Type);
 		}
 	}
 }
@@ -63,8 +62,6 @@ void UProjectileDataManager::GetProjectileFromPool(ProjectileType Type, TArray<A
 		|| PoolEntry->Projectiles.Num() == 0
 		|| Amount > PoolEntry->Projectiles.Num())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("GetProjectileFromPool failed: Type=%d, Amount=%d, PoolSize=%d"),
-			Type, Amount, PoolEntry ? PoolEntry->Projectiles.Num() : 0);
 		return;
 	}
 

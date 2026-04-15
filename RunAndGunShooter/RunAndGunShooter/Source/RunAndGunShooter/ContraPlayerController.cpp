@@ -7,7 +7,6 @@
 
 void AContraPlayerController::ApplyDamage_Implementation(float DamageAmount, AActor* DamageCauser)
 {
-	AContraPlayer* ContraPlayer = Cast<AContraPlayer>(GetPawn());
 	if (!ContraPlayer) return;
 
 	if (ImpactVFX)
@@ -27,7 +26,7 @@ void AContraPlayerController::ApplyDamage_Implementation(float DamageAmount, AAc
 
 bool AContraPlayerController::IsAlive_Implementation() const
 {
-	if (const AContraPlayer* ContraPlayer = Cast<AContraPlayer>(GetPawn()))
+	if (ContraPlayer)
 	{
 		return ContraPlayer->IsAlive();
 	}
@@ -65,6 +64,7 @@ void AContraPlayerController::BeginPlay()
 	}
 
     GameMode = Cast<AContraGameMode>(GetWorld()->GetAuthGameMode());
+	ContraPlayer = Cast<AContraPlayer>(GetPawn());
 
 	if (GameMode)
 	{
