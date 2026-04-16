@@ -10,6 +10,7 @@
 #include "ContraPlayer.generated.h"
 
 class AContraPlayerController;
+class USoundBase;
 
 UENUM(BlueprintType)
 enum VerticalSwitchOption
@@ -61,6 +62,9 @@ protected:
 	float PlatformSwitchDepth = 0.0f;
 
 	UPROPERTY(EditDefaultsOnly)
+	float PlatformSwitchLerpSpeed = 10.0f;
+
+	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<AGunBase> Rifle;
 
 	UPROPERTY(EditDefaultsOnly)
@@ -80,6 +84,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly)
 	UAnimMontage* ShootMontage;
+
+	UPROPERTY(EditDefaultsOnly, Category = "SFX")
+	USoundBase* DeathSound = nullptr;
 
 	UPROPERTY(VisibleAnywhere, Category = "Lives")
 	float RespawnDropHeight = 500.0f;
@@ -119,6 +126,7 @@ public:
 
 	void ApplyDamage(float DamageAmount, AActor* DamageCauser);
 	bool IsAlive() const;
+	void PlayDeathSound();
 
 	void Shoot();
 	
@@ -151,6 +159,9 @@ private:
 	bool bIsJumping = false;
 	bool bIsPlatformSwitchAllowed = true;
 	float CurrentJumpTime = 0.0f;
+
+	bool bIsLerpingDepth = false;
+	float TargetPlatformDepth = 0.0f;
 
     FVector LastTickLocation = FVector::ZeroVector;
 	FVector CurrentLocation = FVector::ZeroVector;

@@ -11,6 +11,8 @@
 class UProjectileDataManager;
 class UNiagaraSystem;
 class UNiagaraComponent;
+class UAudioComponent;
+class USoundBase;
 
 
 UENUM(BlueprintType)
@@ -86,6 +88,9 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = "VFX")
 	UNiagaraComponent* TrailComponent;
 
+	UPROPERTY(VisibleAnywhere, Category = "SFX")
+	UAudioComponent* FlyingAudioComponent;
+
 	UPROPERTY(EditDefaultsOnly)
 	float ProjectileSpeed = 2000.0f;
 
@@ -94,6 +99,12 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "VFX")
 	UNiagaraSystem* TrailVFX = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, Category = "SFX")
+	USoundBase* FlyingSound = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, Category = "SFX")
+	USoundBase* HitSound = nullptr;
 
 
 protected:

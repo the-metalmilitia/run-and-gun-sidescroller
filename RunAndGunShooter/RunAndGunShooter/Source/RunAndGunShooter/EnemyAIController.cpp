@@ -4,6 +4,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "ContraGameMode.h"
 #include "NiagaraFunctionLibrary.h"
+#include "ContraPlayer.h"
 
 void AEnemyAIController::BeginPlay()
 {
@@ -86,9 +87,19 @@ void AEnemyAIController::Die()
 		GameMode->AddScore(ScoreValue);
 	}
 
-	if (ControlledPawn && DeathVFX)
+	if (ControlledPawn)
 	{
-		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), DeathVFX, ControlledPawn->GetActorLocation(), FRotator::ZeroRotator);
+		FVector PawnLocation = ControlledPawn->GetActorLocation();
+
+		if (DeathVFX)
+		{
+			UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), DeathVFX, PawnLocation, FRotator::ZeroRotator);
+		}
+
+		if (AContraPlayer* ContraPlayer = Cast<AContraPlayer>(ControlledPawn))
+		{
+			ContraPlayer->PlayDeathSound();
+		}
 	}
 
 	DestroyPawn();

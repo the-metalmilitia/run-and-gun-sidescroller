@@ -10,6 +10,7 @@
 #include "TurretGun.h"
 #include "ContraPlayer.h"
 class UNiagaraSystem;
+class USoundBase;
 
 #include "Turret.generated.h"
 
@@ -69,6 +70,9 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "VFX")
 	UNiagaraSystem* DeathVFX = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, Category = "SFX")
+	USoundBase* DeathSound = nullptr;
 
 	void FireShot();
 

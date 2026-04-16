@@ -3,6 +3,7 @@
 #include "Turret.h"
 #include "Kismet/GameplayStatics.h"
 #include "NiagaraFunctionLibrary.h"
+#include "Sound/SoundBase.h"
 #include "TurretAIController.h"
 #include "EnemyAIController.h"
 #include "ShooterInterface.h"
@@ -144,9 +145,15 @@ void ATurret::Die()
 		CurrentWeapon = nullptr;
 	}
 
+	FVector TurretLocation = GetActorLocation();
+
 	if (DeathVFX)
 	{
-		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, DeathVFX,
-			GetActorLocation(), FRotator::ZeroRotator);
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, DeathVFX, TurretLocation, FRotator::ZeroRotator);
+	}
+
+	if (DeathSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, DeathSound, TurretLocation);
 	}
 }

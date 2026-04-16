@@ -8,6 +8,8 @@
 #include "NiagaraComponent.h"
 #include "GameFramework/Pawn.h"
 #include "GameFramework/Controller.h"
+#include "Components/AudioComponent.h"
+#include "Sound/SoundBase.h"
 
 
 // Sets default values
@@ -31,6 +33,10 @@ AProjectileBase::AProjectileBase()
 	TrailComponent = CreateDefaultSubobject<UNiagaraComponent>("TrailComponent");
 	TrailComponent->SetupAttachment(Root);
 	TrailComponent->bAutoActivate = false;
+
+	FlyingAudioComponent = CreateDefaultSubobject<UAudioComponent>("FlyingAudioComponent");
+	FlyingAudioComponent->SetupAttachment(Root);
+	FlyingAudioComponent->bAutoActivate = false;
 }
 
 // Called when the game starts or when spawned
@@ -69,11 +75,29 @@ void AProjectileBase::Activate(bool activate, AActor* InInstigator)
 			TrailComponent->Deactivate();
 		}
 	}
+
+	if (FlyingAudioComponent)
+	{
+		if (activate && FlyingSound)
+		{
+			FlyingAudioComponent->SetSound(FlyingSound);
+			FlyingAudioComponent->Play();
+		}
+		else
+		{
+			FlyingAudioComponent->Stop();
+		}
+	}
 }
 
 void AProjectileBase::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (!OtherActor || OtherActor == this || OtherActor == ProjectileInstigator) return;
+
+	if (HitSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, HitSound, GetActorLocation());
+	}
 
 	if (APawn* Pawn = Cast<APawn>(OtherActor))
 	{

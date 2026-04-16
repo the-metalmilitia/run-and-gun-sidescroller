@@ -8,6 +8,7 @@
 #include "EnhancedInput/Public/EnhancedInputSubsystems.h"
 #include "EnhancedInput/Public/EnhancedInputComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Sound/SoundBase.h"
 // Sets default values
 AContraPlayer::AContraPlayer()
 {
@@ -67,7 +68,19 @@ void AContraPlayer::Tick(float DeltaTime)
 		{
 			SwitchPlatform();
 		}
+	}
 
+	if (bIsLerpingDepth)
+	{
+		FVector Loc = GetActorLocation();
+		Loc.Y = FMath::FInterpTo(Loc.Y, TargetPlatformDepth, DeltaTime, PlatformSwitchLerpSpeed);
+		SetActorLocation(Loc);
+		if (FMath::IsNearlyEqual(Loc.Y, TargetPlatformDepth, 1.0f))
+		{
+			Loc.Y = TargetPlatformDepth;
+			SetActorLocation(Loc);
+			bIsLerpingDepth = false;
+		}
 	}
 }
 
@@ -112,8 +125,18 @@ bool AContraPlayer::IsAlive() const
 	return CurrentHealth > 0.0f;
 }
 
+void AContraPlayer::PlayDeathSound()
+{
+	if (DeathSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, DeathSound, GetActorLocation());
+	}
+}
+
 void AContraPlayer::Die()
 {
+	PlayDeathSound();
+
 	const bool bHasLivesRemaining = IsValid(PlayerController) && PlayerController->GetPlayerLives() > 0;
 
 	GetCharacterMovement()->StopMovementImmediately();
@@ -169,6 +192,7 @@ void AContraPlayer::Respawn()
 {
 	VerticalSwitch = VerticalSwitchOption::None;
 	AllowedSwitch = VerticalSwitchOption::None;
+	bIsLerpingDepth = false;
 
 	RespawnLocation.Y = RespawnDepth;
 	RespawnLocation.Z = RespawnDropHeight;
@@ -297,18 +321,20 @@ void AContraPlayer::LookEvent(const FInputActionValue& value)
 
 void AContraPlayer::SwitchPlatform()
 {
-   	bIsJumping = false;
+	bIsJumping = false;
 	CurrentJumpTime = 0.0f;
 	CurrentLocation = GetActorLocation();
 	if (VerticalSwitch == VerticalSwitchOption::Down)
 	{
-		CurrentLocation.Y += PlatformSwitchDepth;
-		SetActorLocation(CurrentLocation);
+		TargetPlatformDepth = CurrentLocation.Y + PlatformSwitchDepth;
+		bIsLerpingDepth = true;
+		UnCrouch();
+		Jump();
 	}
-	else if(VerticalSwitch == VerticalSwitchOption::Up)
+	else if (VerticalSwitch == VerticalSwitchOption::Up)
 	{
-		CurrentLocation.Y -= PlatformSwitchDepth;
-		SetActorLocation(CurrentLocation);
+		TargetPlatformDepth = CurrentLocation.Y - PlatformSwitchDepth;
+		bIsLerpingDepth = true;
 	}
 
 	VerticalSwitch = VerticalSwitchOption::None;
